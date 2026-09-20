@@ -1,0 +1,31 @@
+name: Deploy dashboard to VM
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.py"
+      - "static/**"
+      - "requirements.txt"
+      - ".github/workflows/deploy_dashboard.yml"
+  workflow_dispatch: {}   # trigger manually from the Actions tab if needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH in, pull latest code, restart service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/daves404-automation
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart daves404
+            sleep 2
+            sudo systemctl is-active --quiet daves404 && echo "Deployed OK" || (echo "Service failed to start" && exit 1)

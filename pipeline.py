@@ -1,0 +1,73 @@
+"""
+The same stages as the original one-shot main.py, but split so a UI can
+show a preview before publishing:
+
+  generate_for_preview(topic) -> stops right after uploading the merged
+      video to Cloudinary. Returns everything the dashboard needs to show
+      a preview: a public video URL, and Gemini's suggested caption/hashtags.
+
+  publish_to_instagram(...) -> takes the (possibly user-edited) caption and
+      the video_url from generate_for_preview, and does the actual
+      Instagram publish.
+
+Kept in its own module so both main.py (CLI) and app.py (dashboard API)
+call the same code instead of duplicating pipeline logic.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+
+from config import Settings
+from gemini_client import generate_script
+from instagram_publish import publish_reel, upload_public_video
+from manim_render import render_scene
+from sarvam_tts import synthesize
+from video_merge import merge
+
+
+@dataclass
+class PreviewResult:
+    video_url: str
+    suggested_caption: str
+    suggested_hashtags: list[str]
+    local_video_path: Path
+
+
+def generate_for_preview(topic: str, settings: Settings) -> PreviewResult:
+    work_dir = settings.work_dir / topic[:40].replace(" ", "_").replace("/", "_")
+
+    script = generate_script(topic, settings.gemini_api_key)
+    video_path = render_scene(script.manim_code, work_dir)
+    audio_path = synthesize(
+        text=script.tts_script_hindi,
+        api_key=settings.sarvam_api_key,
+        out_path=work_dir / "narration.wav",
+        model=settings.sarvam_tts_model,
+        speaker=settings.sarvam_tts_speaker,
+        language_code=settings.sarvam_tts_language,
+    )
+    final_path = merge(video_path, audio_path, work_dir / "final.mp4")
+    public_url = upload_public_video(
+        final_path,
+        settings.cloudinary_cloud_name,
+        settings.cloudinary_api_key,
+        settings.cloudinary_api_secret,
+    )
+
+    return PreviewResult(
+        video_url=public_url,
+        suggested_caption=script.caption,
+        suggested_hashtags=script.hashtags,
+        local_video_path=final_path,
+    )
+
+
+def publish_to_instagram(video_url: str, caption: str, settings: Settings) -> str:
+    return publish_reel(
+        video_url=video_url,
+        caption=caption,
+        ig_user_id=settings.ig_user_id,
+        access_token=settings.ig_access_token,
+        api_version=settings.ig_graph_api_version,
+    )

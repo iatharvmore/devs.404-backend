@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>dev's.404 — reel dashboard</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>dev's.404</h1>
+      <span class="subtitle">reel pipeline dashboard</span>
+    </header>
+
+    <section class="token-gate hidden" id="tokenGate"></section>
+
+    <main id="mainApp">
+      <section class="create-job">
+        <input id="topicInput" type="text" placeholder="Topic for today's reel (e.g. How does attention work in transformers?)" />
+        <button id="generateBtn">Generate</button>
+      </section>
+
+      <section id="status" class="status hidden">
+        <div class="spinner"></div>
+        <span id="statusText">Working...</span>
+      </section>
+
+      <section id="preview" class="preview hidden">
+        <video id="previewVideo" controls playsinline></video>
+
+        <label for="captionInput">Caption</label>
+        <textarea id="captionInput" rows="4"></textarea>
+
+        <label for="hashtagsInput">Hashtags (space-separated)</label>
+        <textarea id="hashtagsInput" rows="2"></textarea>
+
+        <button id="publishBtn">Publish to Instagram</button>
+      </section>
+
+      <section id="publishedMsg" class="published hidden">
+        ✅ Published! Media ID: <span id="mediaId"></span>
+      </section>
+
+      <section id="errorMsg" class="error hidden"></section>
+
+      <section class="history">
+        <h2>Recent jobs</h2>
+        <ul id="jobList"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
