@@ -38,11 +38,33 @@ class PreviewResult:
     cloudinary_public_id: str = ""
 
 
-def generate_for_preview(topic: str, settings: Settings) -> PreviewResult:
+def generate_for_preview(topic: str, settings: Settings, max_retries: int = 2) -> PreviewResult:
     work_dir = settings.work_dir / topic[:40].replace(" ", "_").replace("/", "_")
 
-    script = generate_script(topic, settings.gemini_api_key)
-    video_path = render_scene(script.manim_code, work_dir)
+    last_error = None
+    script = None
+    video_path = None
+
+    total_attempts = 1 + max_retries
+    for attempt in range(total_attempts):
+        try:
+            if attempt > 0:
+                print(f"[pipeline] Retrying scene generation (attempt {attempt + 1}/{total_attempts}) with error feedback...")
+            script = generate_script(
+                topic=topic,
+                api_key=settings.gemini_api_key,
+                error_feedback=last_error,
+            )
+            video_path = render_scene(script.manim_code, work_dir)
+            break
+        except Exception as exc:
+            last_error = str(exc)
+            print(f"[pipeline] Attempt {attempt + 1} failed: {exc}")
+            # Clean up partial renders before retrying
+            shutil.rmtree(work_dir / "media", ignore_errors=True)
+            if attempt == total_attempts - 1:
+                raise
+
     audio_path = synthesize(
         text=script.tts_script_hindi,
         api_key=settings.sarvam_api_key,

@@ -32,11 +32,27 @@ def run_pipeline(topic: str) -> str:
     settings = load_settings()
     work_dir = settings.work_dir / topic[:40].replace(" ", "_").replace("/", "_")
 
-    print(f"[1/5] Generating script + Hindi TTS narration for: {topic!r}")
-    script = generate_script(topic, settings.gemini_api_key)
+    last_error = None
+    script = None
+    video_path = None
+    for attempt in range(3):
+        try:
+            if attempt > 0:
+                print(f"[1/5] Retrying scene generation (attempt {attempt + 1}/3) with error feedback...")
+            else:
+                print(f"[1/5] Generating script + Hindi TTS narration for: {topic!r}")
+            script = generate_script(topic, settings.gemini_api_key, error_feedback=last_error)
 
-    print("[2/5] Rendering Manim scene...")
-    video_path = render_scene(script.manim_code, work_dir)
+            print(f"[2/5] Rendering Manim scene (attempt {attempt + 1}/3)...")
+            video_path = render_scene(script.manim_code, work_dir)
+            break
+        except Exception as exc:
+            last_error = str(exc)
+            print(f"[main] Attempt {attempt + 1} failed: {exc}")
+            import shutil
+            shutil.rmtree(work_dir / "media", ignore_errors=True)
+            if attempt == 2:
+                raise
 
     print("[3/5] Synthesizing TTS audio via Sarvam...")
     audio_path = synthesize(
