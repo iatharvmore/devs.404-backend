@@ -47,6 +47,7 @@ def main() -> None:
                 "topic": topic,
                 "status": "ready",
                 "video_url": result.video_url,
+                "cloudinary_public_id": result.cloudinary_public_id,
                 "caption": result.suggested_caption,
                 "hashtags": result.suggested_hashtags,
             },

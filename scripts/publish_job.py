@@ -50,6 +50,25 @@ def main() -> None:
         data["status"] = "published"
         data["media_id"] = media_id
         write_status(job_id, data)
+
+        # Cleanup: Instagram has confirmed published, delete Cloudinary copy
+        pub_id = data.get("cloudinary_public_id")
+        if not pub_id and "video_url" in data:
+            from instagram_publish import extract_cloudinary_public_id
+            pub_id = extract_cloudinary_public_id(data["video_url"])
+        if pub_id:
+            try:
+                from instagram_publish import delete_cloudinary_video
+                delete_cloudinary_video(
+                    pub_id,
+                    cloud_name=settings.cloudinary_cloud_name,
+                    api_key=settings.cloudinary_api_key,
+                    api_secret=settings.cloudinary_api_secret,
+                )
+                print(f"[cleanup] Deleted Cloudinary video: {pub_id}")
+            except Exception as e:
+                print(f"[cleanup] Warning: could not delete Cloudinary video {pub_id}: {e}")
+
         _notify(
             settings,
             f"[dev's.404] Published: {data['topic']}",

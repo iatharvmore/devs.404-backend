@@ -26,12 +26,16 @@ from sarvam_tts import synthesize
 from video_merge import merge
 
 
+import shutil
+
+
 @dataclass
 class PreviewResult:
     video_url: str
     suggested_caption: str
     suggested_hashtags: list[str]
     local_video_path: Path
+    cloudinary_public_id: str = ""
 
 
 def generate_for_preview(topic: str, settings: Settings) -> PreviewResult:
@@ -48,18 +52,25 @@ def generate_for_preview(topic: str, settings: Settings) -> PreviewResult:
         language_code=settings.sarvam_tts_language,
     )
     final_path = merge(video_path, audio_path, work_dir / "final.mp4")
-    public_url = upload_public_video(
+    upload_res = upload_public_video(
         final_path,
         settings.cloudinary_cloud_name,
         settings.cloudinary_api_key,
         settings.cloudinary_api_secret,
     )
 
+    # Clean up local work_dir temporary files (Manim partial renders, WAV, intermediate MP4)
+    try:
+        shutil.rmtree(work_dir, ignore_errors=True)
+    except Exception as e:
+        print(f"[cleanup] warning: could not remove {work_dir}: {e}")
+
     return PreviewResult(
-        video_url=public_url,
+        video_url=upload_res.secure_url,
         suggested_caption=script.caption,
         suggested_hashtags=script.hashtags,
         local_video_path=final_path,
+        cloudinary_public_id=upload_res.public_id,
     )
 
 

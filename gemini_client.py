@@ -34,6 +34,22 @@ You must output two things:
    - use only black/gray/red/green/blue color constants for a clean look
      on a white background, matching a tech-explainer aesthetic
 
+   IMPORTANT SAFE AREA RULES:
+   Create all reels with a generous mobile safe area.
+   Canvas: 9:16, 720x1280 (frame_height = 16.0, frame_width = 9.0).
+   Keep every important visual element, text, title, subtitle,
+   label, arrow, diagram, and animation comfortably away from
+   all four edges.
+   Horizontal safe margin: at least 0.7 Manim units from each edge (keep x within [-3.8, +3.8]).
+   Vertical safe margin: at least 1.0 Manim units from top and bottom (keep y within [-7.0, +7.0]).
+   Never allow text or objects to touch or cross the safe area.
+   Never use the full frame width for text.
+   Keep the composition centered.
+   Prefer smaller text + whitespace over oversized content.
+   Wrap long text instead of shrinking it until it becomes unreadable.
+   Before every animation/phase, verify the complete composition
+   remains inside the safe area.
+
 2. `tts_script_hindi`: a Hindi (Devanagari) narration script, mixing in
    English technical terms as needed, written the way a tech YouTuber would
    narrate this. It should roughly match the pacing/length of the on-screen

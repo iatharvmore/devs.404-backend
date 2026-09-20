@@ -18,9 +18,17 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
+import re
+from typing import NamedTuple
+
 import cloudinary
 import cloudinary.uploader
 import requests
+
+
+class CloudinaryUploadResult(NamedTuple):
+    secure_url: str
+    public_id: str
 
 
 def upload_public_video(
@@ -28,14 +36,38 @@ def upload_public_video(
     cloud_name: str,
     api_key: str,
     api_secret: str,
-) -> str:
+) -> CloudinaryUploadResult:
     cloudinary.config(
         cloud_name=cloud_name, api_key=api_key, api_secret=api_secret, secure=True
     )
     result = cloudinary.uploader.upload(
         str(video_path), resource_type="video", folder="daves404_reels"
     )
-    return result["secure_url"]
+    return CloudinaryUploadResult(
+        secure_url=result["secure_url"],
+        public_id=result["public_id"],
+    )
+
+
+def extract_cloudinary_public_id(video_url: str) -> str | None:
+    """Extracts the public_id from a Cloudinary URL (e.g. daves404_reels/xyz)."""
+    match = re.search(r"/upload/(?:v\d+/)?(.+?)(?:\.[a-zA-Z0-9]+)?$", video_url)
+    if match:
+        return match.group(1)
+    return None
+
+
+def delete_cloudinary_video(
+    public_id: str,
+    cloud_name: str,
+    api_key: str,
+    api_secret: str,
+) -> dict:
+    """Removes the video from Cloudinary after publishing to Instagram."""
+    cloudinary.config(
+        cloud_name=cloud_name, api_key=api_key, api_secret=api_secret, secure=True
+    )
+    return cloudinary.uploader.destroy(public_id, resource_type="video")
 
 
 def publish_reel(

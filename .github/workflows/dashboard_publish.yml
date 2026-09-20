@@ -14,6 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Mark job as publishing
+        run: |
+          python3 -c "import json, pathlib; p = pathlib.Path('status/${{ github.event.client_payload.job_id }}.json'); data = json.loads(p.read_text()) if p.exists() else {'job_id': '${{ github.event.client_payload.job_id }}'}; data['status'] = 'publishing'; p.parent.mkdir(parents=True, exist_ok=True); p.write_text(json.dumps(data, indent=2))"
+          git config user.name "reel-bot"
+          git config user.email "actions@github.com"
+          git add status/
+          git diff --staged --quiet || (git commit -m "status: publishing ${{ github.event.client_payload.job_id }}" && git pull --rebase origin main && git push)
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -44,6 +52,9 @@ jobs:
           git config user.name "reel-bot"
           git config user.email "actions@github.com"
           git add status/
-          git diff --staged --quiet || git commit -m "status: publish ${{ github.event.client_payload.job_id }}"
-          git pull --rebase origin main
-          git push
+          if ! git diff --staged --quiet; then
+            git commit -m "status: publish completed ${{ github.event.client_payload.job_id }}"
+            for i in {1..5}; do
+              git pull --rebase origin main && git push && break || sleep 2
+            done
+          fi

@@ -52,12 +52,20 @@ def run_pipeline(topic: str) -> str:
     final_path = merge(video_path, audio_path, work_dir / "final.mp4")
 
     print("[5/5] Uploading + publishing to Instagram...")
-    public_url = upload_public_video(
+    upload_res = upload_public_video(
         final_path,
         settings.cloudinary_cloud_name,
         settings.cloudinary_api_key,
         settings.cloudinary_api_secret,
     )
+    public_url = upload_res.secure_url
+
+    import shutil
+    try:
+        shutil.rmtree(work_dir, ignore_errors=True)
+    except Exception as e:
+        print(f"[cleanup] warning: could not remove work_dir {work_dir}: {e}")
+
     caption = f"{topic}\n\n#ai #computerscience #devs404"
     media_id = publish_reel(
         video_url=public_url,
@@ -66,6 +74,18 @@ def run_pipeline(topic: str) -> str:
         access_token=settings.ig_access_token,
         api_version=settings.ig_graph_api_version,
     )
+    print(f"Done! Reel is live: media_id={media_id}")
+
+    try:
+        from instagram_publish import delete_cloudinary_video
+        delete_cloudinary_video(
+            upload_res.public_id,
+            settings.cloudinary_cloud_name,
+            settings.cloudinary_api_key,
+            settings.cloudinary_api_secret,
+        )
+    except Exception as e:
+        print(f"[cleanup] warning: could not delete Cloudinary video {upload_res.public_id}: {e}")
 
     return media_id
 
