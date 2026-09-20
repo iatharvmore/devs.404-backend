@@ -5,12 +5,13 @@ on:
     types: [generate]
 
 permissions:
-  contents: write   # needed to commit the status file back
+  contents: write
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
 
@@ -18,11 +19,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ffmpeg \
+            pkg-config \
+            libcairo2-dev \
+            libpango1.0-dev
 
       - name: Install Python deps
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Run generation
         env:
@@ -43,13 +52,3 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
         run: python scripts/generate_job.py
-
-      - name: Commit status file
-        if: always()
-        run: |
-          git config user.name "reel-bot"
-          git config user.email "actions@github.com"
-          git add status/
-          git diff --staged --quiet || git commit -m "status: generate ${{ github.event.client_payload.job_id }}"
-          git pull --rebase origin main
-          git push
