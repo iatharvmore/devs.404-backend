@@ -19,7 +19,6 @@ def _extract_scene_class_name(code: str) -> str:
 
 
 def render_scene(manim_code: str, work_dir: str | Path) -> Path:
-    # Convert to an absolute path so cwd + script_path can never duplicate it.
     work_dir = Path(work_dir).expanduser().resolve()
     work_dir.mkdir(parents=True, exist_ok=True)
 
@@ -28,7 +27,6 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
 
     scene_name = _extract_scene_class_name(manim_code)
 
-    # Run using the same Python interpreter/environment as the GitHub Actions job.
     result = subprocess.run(
         [sys.executable, str(script_path)],
         cwd=str(work_dir),
@@ -44,12 +42,16 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
             f"STDERR:\n{result.stderr}"
         )
 
-    media_root = work_dir / "media" / "videos" / script_path.stem
+    # Manim places the final movie inside a resolution directory,
+    # e.g. media/videos/1080p60/LLMChainOfThought.mp4
+    media_root = work_dir / "media" / "videos"
+
     candidates = list(media_root.rglob(f"{scene_name}.mp4"))
 
     if not candidates:
         raise FileNotFoundError(
             f"Rendered mp4 not found under {media_root}.\n"
+            f"Expected scene: {scene_name}.mp4\n"
             f"stdout was:\n{result.stdout}"
         )
 
