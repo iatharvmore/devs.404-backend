@@ -133,6 +133,15 @@ class TopicScene(Scene):
         bullet2 = safe_text("• Key takeaway two", F_BODY, C_BODY)
         bullet2.next_to(bullet1, DOWN, buff=0.4).align_to(bullet1, LEFT)
 
+        # Example of CORRECT symbol usage:
+        # checkmark = Text("✓", font_size=F_HEADING, color=C_GREEN)
+        # checkmark.next_to(bullet1, LEFT, buff=0.3)
+        # self.play(FadeIn(checkmark))
+
+        # Example of INCORRECT symbol usage (DO NOT USE):
+        # checkmark = Checkmark(...)  # ❌ Checkmark() doesn't exist
+        # cross = Cross(...)           # ❌ Cross() doesn't exist
+
         self.play(FadeIn(summary_heading), run_time=0.5)
         self.play(FadeIn(bullet1), run_time=0.6)
         self.play(FadeIn(bullet2), run_time=0.6)
@@ -250,11 +259,16 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 5. Do NOT change the submobject count of any Mobject during animation.
 6. Prefer: FadeIn, FadeOut, Write, Create, GrowArrow, Indicate.
 7. No deprecated methods (e.g. .set_width() on Text in an animation context).
-8. Never use non-existent Manim classes. For checkmarks use Text('✓') or
-   MathTex(r'\\checkmark'). For crosses use Cross() or Text('✗').
-9. Every object placed on screen must be explicitly FadeOut-ed before a new
+8. CRITICAL: ONLY use these Manim classes: Scene, Text, VGroup, Rectangle, Circle,
+   Line, Arrow, FadeIn, FadeOut, Write, Create, GrowArrow, Indicate, Wait.
+9. CRITICAL: NEVER use these classes (they don't exist or cause crashes):
+   Checkmark, Cross, Tick, Check, Mark, SuccessIcon, ErrorIcon, or any custom icons.
+10. For checkmarks: use Text('✓') or Text('✅') - NEVER use Checkmark()
+11. For crosses: use Text('✗') or Text('❌') - NEVER use Cross()
+12. For any other symbols: use Text with emoji characters
+13. Every object placed on screen must be explicitly FadeOut-ed before a new
    object is placed at a nearby position in the next phase.
-10. NEVER use assert statements in your code - they cause rendering failures.
+14. NEVER use assert statements in your code - they cause rendering failures.
 
 ═══════════════════════════════════════════════════════════════════
 TTS SCRIPT RULES (tts_script_hindi)
@@ -326,7 +340,9 @@ def generate_script(
             f"CRITICAL: NEVER use assert statements in your code - they cause rendering failures.\n"
             f"If you see SAFE_Y_B violations, reduce the number of lines per phase and spread content across more phases.\n"
             f"CRITICAL: If you see numbers, code symbols, or garbled text in content, ensure the TTS script "
-            f"contains ONLY natural Hindi narration with NO code, numbers, or special characters."
+            f"contains ONLY natural Hindi narration with NO code, numbers, or special characters.\n"
+            f"CRITICAL: NEVER use non-existent Manim classes like Checkmark(), Cross(), Tick(), etc. "
+            f"For checkmarks use Text('✓'), for crosses use Text('✗'). ONLY use valid Manim classes."
         )
 
     response = client.models.generate_content(
