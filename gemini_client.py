@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from google import genai
 from google.genai import types
 
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-3.6-flash"
 
 # ─── Manim Code Template ─────────────────────────────────────────────────────
 # Embed a proven skeleton the model MUST adapt, not invent from scratch.
