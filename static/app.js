@@ -11,6 +11,7 @@ const previewVideo = document.getElementById("previewVideo");
 const captionInput = document.getElementById("captionInput");
 const hashtagsInput = document.getElementById("hashtagsInput");
 const publishBtn = document.getElementById("publishBtn");
+const discardBtn = document.getElementById("discardBtn");
 
 const publishedMsg = document.getElementById("publishedMsg");
 const mediaIdSpan = document.getElementById("mediaId");
@@ -127,6 +128,37 @@ publishBtn.addEventListener("click", async () => {
   } catch (err) {
     showError(err.message);
     publishBtn.disabled = false;
+  }
+});
+
+discardBtn.addEventListener("click", async () => {
+  if (!currentJobId) return;
+  if (!confirm("Are you sure you want to discard this video? This cannot be undone.")) return;
+
+  discardBtn.disabled = true;
+  showOnly(statusSection);
+  statusText.textContent = "Discarding...";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/jobs/${currentJobId}`, {
+      method: "DELETE",
+      headers: apiHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    // Clear current job and reset UI
+    currentJobId = null;
+    topicInput.value = "";
+    captionInput.value = "";
+    hashtagsInput.value = "";
+    previewVideo.src = "";
+    showOnly(null);
+    generateBtn.disabled = false;
+    discardBtn.disabled = false;
+    refreshJobList();
+  } catch (err) {
+    showError(err.message);
+    discardBtn.disabled = false;
   }
 });
 

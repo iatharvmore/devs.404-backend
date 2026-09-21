@@ -69,6 +69,25 @@ button {
 button:hover { background: var(--accent-hover); }
 button:disabled { background: var(--border); cursor: not-allowed; }
 
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-group button {
+  flex: 1;
+}
+
+button.discard {
+  background: var(--border);
+  color: var(--muted);
+}
+button.discard:hover {
+  background: var(--error);
+  color: white;
+}
+
 .token-gate, .create-job, .status, .preview, .published, .error, .history {
   background: var(--panel);
   border: 1px solid var(--border);

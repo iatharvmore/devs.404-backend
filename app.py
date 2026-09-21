@@ -34,6 +34,8 @@ from config import load_settings
 from notify import send_email
 from pipeline import generate_for_preview, publish_to_instagram
 
+import shutil
+
 JobStatus = Literal["pending", "generating", "ready", "publishing", "published", "failed"]
 
 
@@ -47,6 +49,7 @@ class Job:
     hashtags: list[str] = field(default_factory=list)
     error: str | None = None
     media_id: str | None = None
+    cloudinary_public_id: str | None = None
 
 
 JOBS: dict[str, Job] = {}
@@ -94,6 +97,7 @@ def _run_generation(job: Job) -> None:
         job.video_url = result.video_url
         job.caption = result.suggested_caption
         job.hashtags = result.suggested_hashtags
+        job.cloudinary_public_id = result.cloudinary_public_id
         job.status = "ready"
         _notify(
             settings,
@@ -162,6 +166,7 @@ def get_job(job_id: str):
         "hashtags": job.hashtags,
         "media_id": job.media_id,
         "error": job.error,
+        "cloudinary_public_id": job.cloudinary_public_id,
     }
 
 
@@ -187,6 +192,42 @@ def list_jobs():
         {"job_id": j.id, "topic": j.topic, "status": j.status}
         for j in sorted(JOBS.values(), key=lambda j: j.id, reverse=True)
     ]
+
+
+@app.delete("/api/jobs/{job_id}")
+def delete_job(job_id: str):
+    job = JOBS.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Delete from memory
+    del JOBS[job_id]
+
+    # Clean up status file if it exists
+    status_dir = Path(__file__).parent / "status"
+    status_file = status_dir / f"{job_id}.json"
+    if status_file.exists():
+        try:
+            status_file.unlink()
+        except Exception as e:
+            print(f"[cleanup] Failed to delete status file {status_file}: {e}")
+
+    # Clean up Cloudinary video if we have a public_id
+    if job.video_url and job.cloudinary_public_id:
+        try:
+            import cloudinary
+            settings = load_settings()
+            cloudinary.config(
+                cloud_name=settings.cloudinary_cloud_name,
+                api_key=settings.cloudinary_api_key,
+                api_secret=settings.cloudinary_api_secret,
+            )
+            cloudinary.uploader.destroy(job.cloudinary_public_id, resource_type="video")
+            print(f"[cleanup] Deleted Cloudinary video: {job.cloudinary_public_id}")
+        except Exception as e:
+            print(f"[cleanup] Failed to delete Cloudinary video: {e}")
+
+    return {"status": "deleted"}
 
 
 # Serve the dashboard's static frontend (index.html, app.js, style.css)
