@@ -93,6 +93,10 @@ class TopicScene(Scene):
         subtitle = safe_text("Hindi subtitle / tagline", F_BODY, C_MUTED)
         subtitle.next_to(title, DOWN, buff=0.55)
 
+        # Note: The TTS [0s] paragraph should start with a catchy opening about the topic,
+        # NOT with "namaste" or "hello". Example: "Did you know..." or "Imagine if..."
+        # The final TTS paragraph must end with "devs dot four zero four"
+
         self.play(Write(title), run_time=1.5)
         self.play(FadeIn(subtitle), run_time=0.8)
         self.wait(3.5)   # ← adjust so sum of animations + waits ≈ phase length
@@ -299,12 +303,19 @@ TTS SCRIPT RULES (tts_script_hindi)
   code comments, no technical jargon that would be read literally.
 • CRITICAL: Do NOT repeat the exact text shown on screen. Describe it naturally
   in Hindi as if explaining to a viewer.
+• CRITICAL: The [0s] paragraph MUST start with a catchy opening related to the topic,
+  NOT with "namaste" or "hello". Start with something like "Did you know..." or
+  "Imagine if..." or directly introduce the concept.
+• CRITICAL: The final paragraph MUST end with "devs dot four zero four" exactly.
+  This is the channel signature/outro.
 
 Example format:
-  [0s] आज हम सीखेंगे Chain of Thought Prompting के बारे में — एक technique
-  जो LLMs को step-by-step सोचने पर मजबूर करती है।
+  [0s] Did you know LLMs can think step-by-step? Let's explore Chain of Thought —
+  एक technique जो complex problems को solve करने में help करती है।
   [6s] पहले देखते हैं बिना CoT के क्या होता है। जब हम LLM को directly पूछते
   हैं...
+  [45s] So that's how Chain of Thought makes LLMs smarter. Follow for more AI insights —
+  devs dot four zero four.
 
 ═══════════════════════════════════════════════════════════════════
 OTHER OUTPUTS
@@ -354,7 +365,9 @@ def generate_script(
             f"CRITICAL: NEVER use non-existent Manim classes like Checkmark(), Cross(), Tick(), etc. "
             f"For checkmarks use Text('✓'), for crosses use Text('✗'). ONLY use valid Manim classes.\n"
             f"CRITICAL: Ensure the script ends with 'if __name__ == \"__main__\": scene.render()' - "
-            f"this is required for video generation. The render call MUST be preserved."
+            f"this is required for video generation. The render call MUST be preserved.\n"
+            f"CRITICAL: TTS [0s] must start with catchy topic opening, NOT 'namaste'. "
+            f"Final TTS paragraph must end with 'devs dot four zero four'."
         )
 
     response = client.models.generate_content(

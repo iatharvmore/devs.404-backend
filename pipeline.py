@@ -68,6 +68,25 @@ def _validate_tts_script(tts_script: str) -> None:
             f"TTS script must be pure Hindi narration without code or symbols."
         )
 
+    # Check that [0s] paragraph doesn't start with namaste/hello
+    first_paragraph_match = re.search(r'\[0s\]\s*(.*?)(?=\[\d+s\]|$)', tts_script, re.DOTALL)
+    if first_paragraph_match:
+        first_text = first_paragraph_match.group(1).strip().lower()
+        # Get first few words to check opening
+        first_words = ' '.join(first_text.split()[:3])
+        if 'namaste' in first_words or 'hello' in first_words:
+            raise ValueError(
+                f"TTS script [0s] paragraph starts with 'namaste' or 'hello'. "
+                f"Must start with a catchy topic-related opening instead."
+            )
+
+    # Check that the script ends with "devs dot four zero four"
+    if not re.search(r'devs dot four zero four', tts_script, re.IGNORECASE):
+        raise ValueError(
+            f"TTS script must end with 'devs dot four zero four'. "
+            f"This is the required channel signature."
+        )
+
 
 @dataclass
 class PreviewResult:
