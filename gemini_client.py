@@ -19,142 +19,169 @@ MODEL = "gemini-2.5-flash"
 _MANIM_TEMPLATE = '''
 from manim import *
 
-# ── CONFIG ── do NOT change these four lines ──────────────────────────────────
-config.pixel_height  = 1920
-config.pixel_width   = 720
-config.frame_height  = 16.0    # Manim units tall  → y ∈ [-8.0, +8.0]
-config.frame_width   = 9.0     # Manim units wide  → x ∈ [-4.5, +4.5]
+# ── CONFIG (Mobile Vertical 9:16) ───────────────────────────────────────────
+config.pixel_height = 1280
+config.pixel_width = 720
+config.frame_height = 16.0
+config.frame_width = 9.0
 config.background_color = WHITE
-
-# ── SAFE AREA ── ALL content must live inside these bounds ───────────────────
-# The Instagram Reels UI overlays ~20% at the bottom (like/comment bar, caption)
-# and ~10% at the top (back arrow). Keep content strictly within:
-#   X : -3.4  to  +3.4   (leaving 1.1 units of padding on each side)
-#   Y : -4.8  to  +6.8   (leaving 3.2 at bottom for IG UI, 1.2 at top)
-SAFE_X    = 3.4    # max |x| value
-SAFE_Y_T  = 6.8    # max y (top)
-SAFE_Y_B  = -4.8   # min y (bottom — avoids IG like/comment overlay)
-MAX_W     = 2 * SAFE_X - 0.4   # = 6.4  max width for any Text or shape
-
-# ── FONTS ────────────────────────────────────────────────────────────────────
-F_TITLE   = 52   # Scene title  (one per scene, bold)
-F_HEADING = 40   # Section heading
-F_BODY    = 32   # Regular body text
-F_SMALL   = 24   # Labels / footnotes — never go below 24
-
-# ── COLORS ── use only these on a WHITE background ───────────────────────────
-C_TITLE   = "#0f172a"   # near-black
-C_BODY    = "#1e293b"   # dark slate
-C_ACCENT  = "#6366f1"   # indigo
-C_GREEN   = "#059669"   # emerald
-C_RED     = "#dc2626"   # red
-C_MUTED   = "#64748b"   # slate-gray for secondary text
-
-def safe_text(text_str, font_size, color, **kwargs):
-    """Create a Text that is guaranteed to fit inside MAX_W."""
-    t = Text(text_str, font_size=font_size, color=color, **kwargs)
-    if t.width > MAX_W:
-        t.scale_to_fit_width(MAX_W)
-    return t
-
-def wrap_text(text_str, font_size, color, max_width=MAX_W, **kwargs):
-    """
-    For long strings: break at word boundaries to keep each line <= max_width.
-    Returns a VGroup of Text lines arranged with buff=0.25 downward.
-    """
-    words = text_str.split()
-    lines, current = [], ""
-    probe = Text("A", font_size=font_size, color=color)
-    char_w = probe.width  # approximate width per char at this font size
-    chars_per_line = max(10, int(max_width / (char_w * 0.55)))
-    for word in words:
-        if len(current) + len(word) + 1 <= chars_per_line:
-            current = (current + " " + word).strip()
-        else:
-            if current:
-                lines.append(current)
-            current = word
-    if current:
-        lines.append(current)
-    objs = [Text(l, font_size=font_size, color=color, **kwargs) for l in lines]
-    for o in objs:
-        if o.width > max_width:
-            o.scale_to_fit_width(max_width)
-    group = VGroup(*objs).arrange(DOWN, buff=0.25)
-    return group
-
+config.verbosity = "WARNING"
 
 class TopicScene(Scene):
     def construct(self):
-        # ── PHASE 1 : Title card   [0s – 6s] ─────────────────────────────────
-        title = safe_text("Topic Title Here", F_TITLE, C_TITLE, weight=BOLD)
-        title.move_to(UP * 6.0)   # near top, inside SAFE_Y_T
+        # ── FIXED UI ELEMENTS (Top Zone) ───────────────────────────────────────
+        header = Text("TOPIC TITLE", color=BLACK, weight=BOLD).scale(0.75).to_edge(UP, buff=0.8)
+        subtitle = Text("Topic subtitle / description", color=GRAY_D).scale(0.38).next_to(header, DOWN)
+        
+        formula = MathTex(
+            r"\\text{Key Formula or Concept}", color=BLACK
+        ).scale(0.55).next_to(subtitle, DOWN, buff=0.5)
+        
+        self.add(header, subtitle, formula)
 
-        subtitle = safe_text("Hindi subtitle / tagline", F_BODY, C_MUTED)
-        subtitle.next_to(title, DOWN, buff=0.55)
+        # ==========================================
+        # PHASE 1: INTRODUCTION / PROBLEM (0-10s)
+        # ==========================================
+        # Use rectangles, text boxes to introduce the concept or problem
+        box1 = RoundedRectangle(width=3.2, height=1.6, color=BLUE_E, fill_opacity=0.15).shift(LEFT * 1.8 + DOWN * 0.8)
+        title1 = Text("Concept 1", color=BLUE_E, weight=BOLD).scale(0.5).move_to(box1.get_top() + DOWN * 0.3)
+        desc1 = Text("Description of\\nconcept 1", color=BLACK).scale(0.32).move_to(box1.get_center() + DOWN * 0.2)
+        group1 = VGroup(box1, title1, desc1)
 
-        # Note: The TTS [0s] paragraph should start with a catchy opening about the topic,
-        # NOT with "namaste" or "hello". Example: "Did you know..." or "Imagine if..."
-        # The final TTS paragraph must end with "devs dot four zero four"
+        box2 = RoundedRectangle(width=3.2, height=1.6, color=PURPLE, fill_opacity=0.15).shift(RIGHT * 1.8 + DOWN * 0.8)
+        title2 = Text("Concept 2", color=PURPLE, weight=BOLD).scale(0.5).move_to(box2.get_top() + DOWN * 0.3)
+        desc2 = Text("Description of\\nconcept 2", color=BLACK).scale(0.32).move_to(box2.get_center() + DOWN * 0.2)
+        group2 = VGroup(box2, title2, desc2)
 
-        self.play(Write(title), run_time=1.5)
-        self.play(FadeIn(subtitle), run_time=0.8)
-        self.wait(3.5)   # ← adjust so sum of animations + waits ≈ phase length
+        self.play(FadeIn(group1, shift=RIGHT), FadeIn(group2, shift=LEFT), run_time=3)
+        self.wait(2)
 
-        # ── PHASE 2 : First concept   [6s – 22s] ─────────────────────────────
-        heading1 = safe_text("Section 1 Heading", F_HEADING, C_ACCENT, weight=BOLD)
-        heading1.move_to(UP * 4.8)   # below title area
-
-        # For multi-line body text, always use wrap_text():
-        # Example of GOOD text content: "Chain of Thought breaks complex problems"
-        # Example of BAD text content: "CoT_prompt_v2.1", "user_query_12345", "Error: 0x45F"
-        body1 = wrap_text(
-            "First explanation line goes here and wraps automatically if long",
-            F_BODY, C_BODY
+        # Merge or relationship transition
+        plus_sign = Text("+", color=GREEN_E, weight=BOLD).scale(0.8).move_to(DOWN * 0.8)
+        self.play(
+            group1.animate.shift(RIGHT * 0.6),
+            group2.animate.shift(LEFT * 0.6),
+            FadeIn(plus_sign),
+            run_time=2
         )
-        body1.next_to(heading1, DOWN, buff=0.55)
+        self.wait(1)
 
-        body2 = wrap_text("Second point of the concept", F_BODY, C_BODY)
-        body2.next_to(body1, DOWN, buff=0.45)
+        # ==========================================
+        # PHASE 2: CORE MECHANISM (10-25s)
+        # ==========================================
+        self.play(FadeOut(group1), FadeOut(group2), FadeOut(plus_sign), run_time=1)
 
-        self.play(FadeOut(subtitle), run_time=0.4)
-        self.play(FadeIn(heading1), run_time=0.5)
-        self.play(Write(body1),  run_time=1.8)
-        self.play(Write(body2),  run_time=1.5)
-        self.wait(9.0)
-        self.play(FadeOut(heading1), FadeOut(body1), FadeOut(body2), run_time=0.6)
+        mechanism_title = Text("Core Mechanism / Architecture", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
+        self.play(FadeIn(mechanism_title), run_time=1)
 
-        # ── PHASE 3 : Second concept   [22s – 40s] ────────────────────────────
-        # ... (same pattern — heading near y=4.8, body below it with buff=0.5)
+        # Vertical stack of components
+        comp1 = RoundedRectangle(width=5.5, height=0.6, color=ORANGE, fill_opacity=0.2).shift(UP * 0.4)
+        comp1_txt = Text("Component 1", color=ORANGE).scale(0.32).move_to(comp1.get_center())
+        
+        comp2 = RoundedRectangle(width=5.5, height=0.6, color=PURPLE, fill_opacity=0.2).shift(DOWN * 0.4)
+        comp2_txt = Text("Component 2", color=PURPLE).scale(0.32).move_to(comp2.get_center())
 
-        # ── PHASE 4 : Summary / CTA   [40s – 55s] ────────────────────────────
-        summary_heading = safe_text("Summary", F_HEADING, C_GREEN, weight=BOLD)
-        summary_heading.move_to(UP * 4.8)
+        comp3 = RoundedRectangle(width=5.5, height=0.6, color=BLUE_E, fill_opacity=0.2).shift(DOWN * 1.2)
+        comp3_txt = Text("Component 3", color=BLUE_E).scale(0.32).move_to(comp3.get_center())
 
-        bullet1 = safe_text("• Key takeaway one", F_BODY, C_BODY)
-        bullet1.next_to(summary_heading, DOWN, buff=0.6).align_to(summary_heading, LEFT)
+        comp4 = RoundedRectangle(width=5.5, height=0.6, color=ORANGE, fill_opacity=0.2).shift(DOWN * 2.0)
+        comp4_txt = Text("Component 4", color=ORANGE).scale(0.32).move_to(comp4.get_center())
 
-        bullet2 = safe_text("• Key takeaway two", F_BODY, C_BODY)
-        bullet2.next_to(bullet1, DOWN, buff=0.4).align_to(bullet1, LEFT)
+        mechanism_stack = VGroup(
+            VGroup(comp1, comp1_txt),
+            VGroup(comp2, comp2_txt),
+            VGroup(comp3, comp3_txt),
+            VGroup(comp4, comp4_txt)
+        )
 
-        # Example of CORRECT symbol usage:
-        # checkmark = Text("✓", font_size=F_HEADING, color=C_GREEN)
-        # checkmark.next_to(bullet1, LEFT, buff=0.3)
-        # self.play(FadeIn(checkmark))
+        self.play(Create(mechanism_stack, lag_ratio=0.2), run_time=5)
+        self.wait(2)
 
-        # Example of INCORRECT symbol usage (DO NOT USE):
-        # checkmark = Checkmark(...)  # ❌ Checkmark() doesn't exist
-        # cross = Cross(...)           # ❌ Cross() doesn't exist
+        # Connection arrows
+        conn_line = Line(start=comp4.get_bottom() + DOWN * 0.3, end=comp1.get_top() + UP * 0.3, color=GREEN_E, stroke_width=3)
+        conn_arrow = Arrow(start=comp4.get_bottom() + DOWN * 0.3, end=comp4.get_bottom(), color=GREEN_E, stroke_width=3)
+        conn_label = Text("Connections / Flow", color=GREEN_E).scale(0.32).next_to(mechanism_stack, DOWN, buff=0.4)
 
-        self.play(FadeIn(summary_heading), run_time=0.5)
-        self.play(FadeIn(bullet1), run_time=0.6)
-        self.play(FadeIn(bullet2), run_time=0.6)
-        self.wait(12.0)
-        self.play(FadeOut(summary_heading), FadeOut(bullet1), FadeOut(bullet2))
+        self.play(Create(conn_line), Create(conn_arrow), FadeIn(conn_label), run_time=3)
+        self.wait(2)
 
-        # ── END : hold the last frame for 1 second ────────────────────────────
-        self.wait(1.0)
+        # ==========================================
+        # PHASE 3: DEEP DIVE (25-40s)
+        # ==========================================
+        self.play(
+            FadeOut(mechanism_stack),
+            FadeOut(conn_line),
+            FadeOut(conn_arrow),
+            FadeOut(conn_label),
+            FadeOut(mechanism_title),
+            run_time=1
+        )
 
+        detail_title = Text("Deep Dive into Key Parts", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
+        self.play(FadeIn(detail_title), run_time=1)
+
+        # Detail boxes
+        detail1_box = RoundedRectangle(width=6.2, height=1.2, color=BLUE_E, fill_opacity=0.15).shift(UP * 0.2)
+        detail1_txt = Text("Key detail 1\\n(explanation)", color=BLUE_E).scale(0.32).move_to(detail1_box.get_center())
+
+        detail2_box = RoundedRectangle(width=6.2, height=1.2, color=PURPLE, fill_opacity=0.15).shift(DOWN * 1.3)
+        detail2_txt = Text("Key detail 2\\n(explanation)", color=PURPLE).scale(0.32).move_to(detail2_box.get_center())
+
+        self.play(Create(VGroup(detail1_box, detail1_txt)), run_time=3)
+        self.play(Flash(detail1_box, color=BLUE_E, line_length=0.3), run_time=1)
+
+        self.play(Create(VGroup(detail2_box, detail2_txt)), run_time=3)
+        self.play(Flash(detail2_box, color=PURPLE, line_length=0.3), run_time=1)
+        self.wait(3)
+
+        # ==========================================
+        # PHASE 4: APPLICATION / PIPELINE (40-52s)
+        # ==========================================
+        self.play(
+            FadeOut(VGroup(detail1_box, detail1_txt)),
+            FadeOut(VGroup(detail2_box, detail2_txt)),
+            FadeOut(detail_title),
+            run_time=1
+        )
+
+        app_title = Text("Application / Pipeline", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
+        self.play(FadeIn(app_title), run_time=1)
+
+        # Pipeline steps
+        step1_box = Rectangle(width=5.5, height=0.6, color=GRAY_D, fill_opacity=0.2).shift(DOWN * 2.2)
+        step1_txt = Text("Step 1: Input", color=BLACK).scale(0.3).move_to(step1_box.get_center())
+
+        step2_box = Rectangle(width=5.5, height=0.6, color=TEAL, fill_opacity=0.2).shift(DOWN * 1.4)
+        step2_txt = Text("Step 2: Process", color=TEAL).scale(0.3).move_to(step2_box.get_center())
+
+        step3_box = Rectangle(width=5.5, height=0.6, color=GREEN_E, fill_opacity=0.2).shift(DOWN * 0.6)
+        step3_txt = Text("Step 3: Core", color=GREEN_E).scale(0.3).move_to(step3_box.get_center())
+
+        step4_box = Rectangle(width=5.5, height=0.6, color=RED_E, fill_opacity=0.2).shift(UP * 0.2)
+        step4_txt = Text("Step 4: Output", color=RED_E).scale(0.3).move_to(step4_box.get_center())
+
+        pipeline_stack = VGroup(
+            VGroup(step1_box, step1_txt),
+            VGroup(step2_box, step2_txt),
+            VGroup(step3_box, step3_txt),
+            VGroup(step4_box, step4_txt)
+        )
+
+        self.play(Create(pipeline_stack, lag_ratio=0.2), run_time=5)
+        self.wait(2)
+
+        # ==========================================
+        # PHASE 5: OUTRO & RESULT (52-60s)
+        # ==========================================
+        self.play(
+            pipeline_stack[2][0].animate.set_fill(color=GREEN_E, opacity=0.8),
+            formula.animate.set_color(GREEN_E),
+            run_time=2
+        )
+        
+        result_text = Text("Result / Takeaway", color=GREEN_E, weight=BOLD).scale(0.6).shift(UP * 1.2)
+        self.play(FadeIn(result_text), Flash(result_text, color=GREEN_E), run_time=2)
+        self.wait(4) # Final hold
 
 if __name__ == "__main__":
     scene = TopicScene()
@@ -189,100 +216,58 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 ```
 
 ─── A. FRAME & CONFIG (copy exactly) ───────────────────────────────────────
-• config.pixel_height = 1920, config.pixel_width = 720
+• config.pixel_height = 1280, config.pixel_width = 720
 • config.frame_height = 16.0, config.frame_width = 9.0   (9:16 vertical)
 • config.background_color = WHITE
+• config.verbosity = "WARNING"
 • CRITICAL: The if __name__ == "__main__": block at the end MUST be preserved exactly.
   It contains scene.render() which is required for video generation.
 
-─── B. SAFE AREA (HARD CONSTRAINTS — never exceed) ─────────────────────────
-• ALL objects must have:
-    x ∈ [-3.4, +3.4]    — horizontal safe zone (Instagram has none, but be safe)
-    y ∈ [-4.8, +6.8]    — vertical safe zone
-  The bottom is cut short to -4.8 (not -8.0) because Instagram Reels overlays
-  (like/comment/share buttons, username, caption) cover roughly the bottom 20%
-  of the screen — anything below y = -4.8 will be hidden.
-• title.move_to(UP * 6.0) is the standard top position for a scene title.
-• After placing each object, the LOWEST point of that object (get_bottom()[1])
-  must be > -4.8. DO NOT add assert statements - they cause failures.
-• NEVER use get_center() ± large offsets that push objects out of the safe area.
-• CRITICAL: If you have more than 3-4 body text lines, you MUST split them across
-  multiple phases or reduce the number of lines. Stacking too many objects will
-  inevitably push content below SAFE_Y_B = -4.8.
-• For sections with lots of content, use fewer lines per section (2-3 max) and
-  spread across more phases rather than cramming everything into one phase.
+─── B. ADAPTATION RULES ─────────────────────────────────────────────────────
+• Replace "TOPIC TITLE" with your actual topic
+• Replace "Topic subtitle / description" with a brief description
+• Replace "Key Formula or Concept" with a relevant formula or key concept
+• Adapt the 5 phases to your specific topic content
+• Keep the exact structure and timing of each phase
+• Maintain the visual style (rectangles, colors, animations)
 
-─── C. FONT SIZES (hard caps) ───────────────────────────────────────────────
-• Scene title        : F_TITLE  = 52   (bold, one per scene)
-• Section headings   : F_HEADING = 40
-• Body text          : F_BODY   = 32
-• Labels / footnotes : F_SMALL  = 24   ← MINIMUM — never go below 24
-• If a Text object exceeds MAX_W = 6.4 in width, call scale_to_fit_width(6.4)
-  on it — never let text go wider than MAX_W.
-• CRITICAL: Text content should be human-readable labels, not raw data or code.
-• CRITICAL: Never display raw numbers, IDs, hashes, or technical identifiers.
-• Use descriptive text (e.g., "Step 1", "Query", "Response") instead of values.
+─── C. VISUAL ELEMENTS (use these from the template) ───────────────────────
+• RoundedRectangle, Rectangle for boxes
+• Text for all text content
+• MathTex for formulas
+• Line, Arrow for connections
+• VGroup for grouping elements
+• FadeIn, FadeOut, Create, Flash for animations
+• Colors: BLUE_E, PURPLE, ORANGE, GREEN_E, TEAL, RED_E, GRAY_D, BLACK
 
-─── D. TEXT WRAPPING (required for any sentence > ~5 words) ─────────────────
-• Use the wrap_text() helper from the template for ALL body content strings.
-• NEVER put a long sentence in a single Text object without wrapping.
-• Break long concepts into 2–3 short lines, each ≤ 6–7 words.
-• Lines in a section must be stacked with VGroup(...).arrange(DOWN, buff=0.3).
-• CRITICAL: Text content should be natural language, not code or raw data.
-• CRITICAL: Avoid displaying raw numbers, IDs, or technical identifiers in text.
-• Use descriptive labels instead of raw values (e.g., "User Query" instead of "12345").
-
-─── E. VERTICAL SPACING (mandatory minimums) ────────────────────────────────
-• buff between title and first section heading : 0.5 – 0.7
-• buff between heading and first body line     : 0.45 – 0.65
-• buff between successive body lines           : 0.3 – 0.45
-• buff between two separate VGroups/sections   : 0.5 – 0.8
-• NEVER use buff < 0.25 anywhere.
-• Leave at least 1.5 units of empty space at the BOTTOM of each phase so
-  the Instagram caption overlay doesn't clash with content.
-
-─── F. NO OVERLAP RULE ──────────────────────────────────────────────────────
-• Before every self.play(), mentally verify: are all CURRENTLY VISIBLE objects
-  non-overlapping? If you FadeOut old objects, they are no longer visible.
-• NEVER add a new object whose bounding box intersects an already-visible one.
-
-─── G. TIMING (total 55 – 70 s) ─────────────────────────────────────────────
-• Annotate every phase with its time range in a comment:  # [0s – 6s]
+─── D. TIMING RULES (STRICT 60s) ────────────────────────────────────────────
+• CRITICAL: Total video length MUST be exactly 60 seconds, no more, no less.
+• Annotate every phase with its time range in a comment:  # [0s – 10s]
 • Include the wait() call that fills the remaining time in that phase.
-• Typical phase lengths:
-    Title card    : 5 – 8 s
-    Each concept  : 12 – 18 s
-    Summary / CTA : 10 – 14 s
-    Final hold    : 1 – 2 s
-• Total must be 55 – 70 s. Calculate by summing all run_time + wait() values.
+• Phase timing (total = 60s):
+    Phase 1 (Intro/Problem)    : 0s – 10s   (10s)
+    Phase 2 (Core Mechanism)   : 10s – 25s  (15s)
+    Phase 3 (Deep Dive)       : 25s – 40s  (15s)
+    Phase 4 (Application)      : 40s – 52s  (12s)
+    Phase 5 (Outro/Result)     : 52s – 60s  (8s)
+• Calculate total by summing all run_time + wait() values = exactly 60s.
 
-─── G.5 CRITICAL RENDERING REQUIREMENTS ─────────────────────────────────────
+─── E. CRITICAL RENDERING REQUIREMENTS ─────────────────────────────────────
 • The script MUST end with the exact render call:
   if __name__ == "__main__":
-      scene = YourClassName()
+      scene = TopicScene()
       scene.render()
 • DO NOT modify or remove this block - it's what generates the video file.
 • DO NOT add any other code after scene.render() that would prevent execution.
 
-─── H. STABILITY RULES (prevent runtime crashes) ────────────────────────────
-1. NEVER use Transform(), ReplacementTransform(), TransformMatchingShapes()
-   or TransformMatchingTex() on Text, MathTex, or Tex objects.
-2. NEVER directly transform one Text into another Text with different words.
-3. To change text: FadeOut(old), then FadeIn(new) — always.
-4. .animate.shift(), .animate.scale(), .animate.move_to() are fine.
-5. Do NOT change the submobject count of any Mobject during animation.
-6. Prefer: FadeIn, FadeOut, Write, Create, GrowArrow, Indicate.
-7. No deprecated methods (e.g. .set_width() on Text in an animation context).
-8. CRITICAL: ONLY use these Manim classes: Scene, Text, VGroup, Rectangle, Circle,
-   Line, Arrow, FadeIn, FadeOut, Write, Create, GrowArrow, Indicate, Wait.
-9. CRITICAL: NEVER use these classes (they don't exist or cause crashes):
-   Checkmark, Cross, Tick, Check, Mark, SuccessIcon, ErrorIcon, or any custom icons.
-10. For checkmarks: use Text('✓') or Text('✅') - NEVER use Checkmark()
-11. For crosses: use Text('✗') or Text('❌') - NEVER use Cross()
-12. For any other symbols: use Text with emoji characters
-13. Every object placed on screen must be explicitly FadeOut-ed before a new
-   object is placed at a nearby position in the next phase.
-14. NEVER use assert statements in your code - they cause rendering failures.
+─── E. STABILITY RULES (prevent runtime crashes) ────────────────────────────
+1. ONLY use Manim classes from the template: Scene, Text, MathTex, VGroup,
+   Rectangle, RoundedRectangle, Line, Arrow, FadeIn, FadeOut, Create, Flash
+2. NEVER use Transform(), ReplacementTransform(), TransformMatchingShapes()
+3. NEVER use non-existent classes: Checkmark, Cross, Tick, etc.
+4. For symbols use Text with emoji characters
+5. Keep the exact structure of each phase from the template
+6. Always FadeOut old objects before FadeIn new ones
 
 ═══════════════════════════════════════════════════════════════════
 TTS SCRIPT RULES (tts_script_hindi)
@@ -310,12 +295,13 @@ TTS SCRIPT RULES (tts_script_hindi)
   This is the channel signature/outro.
 
 Example format:
-  [0s] Did you know LLMs can think step-by-step? Let's explore Chain of Thought —
-  एक technique जो complex problems को solve करने में help करती है।
-  [6s] पहले देखते हैं बिना CoT के क्या होता है। जब हम LLM को directly पूछते
-  हैं...
-  [45s] So that's how Chain of Thought makes LLMs smarter. Follow for more AI insights —
-  devs dot four zero four.
+  [0s] Speech Recognition में लंबे समय से एक दुविधा रही है: CNNs ऑडियो के local features
+  जैसे pitch को बेहतरीन तरीके से कैच करते हैं, जबकि Transformers पूरे सेंटेंस का
+  global context समझते हैं। तो दोनों में से बेहतर कौन सा है?
+  [10s] जवाब है: Conformer Architecture! यह Model दोनों की ताकतों को मिलाकर
+  एक स्पेशल Macaron Style Block बनाता है।
+  [52s] यही वजह है कि आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं!
+  ऐसे ही AI Breakdowns के लिए अभी Follow करें devs dot four zero four ko!
 
 ═══════════════════════════════════════════════════════════════════
 OTHER OUTPUTS
@@ -367,7 +353,9 @@ def generate_script(
             f"CRITICAL: Ensure the script ends with 'if __name__ == \"__main__\": scene.render()' - "
             f"this is required for video generation. The render call MUST be preserved.\n"
             f"CRITICAL: TTS [0s] must start with catchy topic opening, NOT 'namaste'. "
-            f"Final TTS paragraph must end with 'devs dot four zero four'."
+            f"Final TTS paragraph must end with 'devs dot four zero four'.\n"
+            f"CRITICAL: Total video MUST be exactly 60 seconds. Follow the template timing: "
+            f"Phase 1: 0-10s, Phase 2: 10-25s, Phase 3: 25-40s, Phase 4: 40-52s, Phase 5: 52-60s."
         )
 
     response = client.models.generate_content(
