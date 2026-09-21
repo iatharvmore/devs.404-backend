@@ -102,6 +102,8 @@ class TopicScene(Scene):
         heading1.move_to(UP * 4.8)   # below title area
 
         # For multi-line body text, always use wrap_text():
+        # Example of GOOD text content: "Chain of Thought breaks complex problems"
+        # Example of BAD text content: "CoT_prompt_v2.1", "user_query_12345", "Error: 0x45F"
         body1 = wrap_text(
             "First explanation line goes here and wraps automatically if long",
             F_BODY, C_BODY
@@ -202,12 +204,18 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 • Labels / footnotes : F_SMALL  = 24   ← MINIMUM — never go below 24
 • If a Text object exceeds MAX_W = 6.4 in width, call scale_to_fit_width(6.4)
   on it — never let text go wider than MAX_W.
+• CRITICAL: Text content should be human-readable labels, not raw data or code.
+• CRITICAL: Never display raw numbers, IDs, hashes, or technical identifiers.
+• Use descriptive text (e.g., "Step 1", "Query", "Response") instead of values.
 
 ─── D. TEXT WRAPPING (required for any sentence > ~5 words) ─────────────────
 • Use the wrap_text() helper from the template for ALL body content strings.
 • NEVER put a long sentence in a single Text object without wrapping.
 • Break long concepts into 2–3 short lines, each ≤ 6–7 words.
 • Lines in a section must be stacked with VGroup(...).arrange(DOWN, buff=0.3).
+• CRITICAL: Text content should be natural language, not code or raw data.
+• CRITICAL: Avoid displaying raw numbers, IDs, or technical identifiers in text.
+• Use descriptive labels instead of raw values (e.g., "User Query" instead of "12345").
 
 ─── E. VERTICAL SPACING (mandatory minimums) ────────────────────────────────
 • buff between title and first section heading : 0.5 – 0.7
@@ -259,6 +267,14 @@ TTS SCRIPT RULES (tts_script_hindi)
   on screen at that moment.
 • Total length: 2000 – 2400 characters (hard limit: 2500).
 • Style: energetic tech YouTuber — clear, concise, no filler words.
+• CRITICAL: NEVER include Manim code, variable names, function names, or any
+  programming syntax in the TTS script. This is for spoken Hindi narration only.
+• CRITICAL: NEVER include numbers, special characters, or code symbols like
+  "#", "$", "{", "}", "()", etc. in the spoken content. Use natural language.
+• CRITICAL: The TTS script must be pure narration text — no formatting, no
+  code comments, no technical jargon that would be read literally.
+• CRITICAL: Do NOT repeat the exact text shown on screen. Describe it naturally
+  in Hindi as if explaining to a viewer.
 
 Example format:
   [0s] आज हम सीखेंगे Chain of Thought Prompting के बारे में — एक technique
@@ -308,7 +324,9 @@ def generate_script(
             f"Strictly enforce MANIM STABILITY RULES: NEVER use Transform() or ReplacementTransform() "
             f"on Text/MathTex, and use FadeOut + FadeIn for text replacements instead.\n"
             f"CRITICAL: NEVER use assert statements in your code - they cause rendering failures.\n"
-            f"If you see SAFE_Y_B violations, reduce the number of lines per phase and spread content across more phases."
+            f"If you see SAFE_Y_B violations, reduce the number of lines per phase and spread content across more phases.\n"
+            f"CRITICAL: If you see numbers, code symbols, or garbled text in content, ensure the TTS script "
+            f"contains ONLY natural Hindi narration with NO code, numbers, or special characters."
         )
 
     response = client.models.generate_content(

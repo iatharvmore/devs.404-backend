@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import re
 
 from config import Settings
 from gemini_client import generate_script
@@ -27,6 +28,45 @@ from video_merge import merge
 
 
 import shutil
+
+
+def _validate_tts_script(tts_script: str) -> None:
+    """Validate that TTS script contains only natural Hindi text, no code/symbols."""
+    # Check for code-like patterns
+    code_patterns = [
+        r'\{.*\}',           # Curly braces
+        r'\[.*\]',           # Square brackets (except time markers)
+        r'<.*>',             # Angle brackets
+        r'def \w+',          # Function definitions
+        r'class \w+',        # Class definitions
+        r'import \w+',       # Import statements
+        r'=\s*\w+',          # Variable assignments
+        r'\w+\(\)',          # Function calls
+        r'#\w+',             # Hash symbols (except hashtags)
+        r'\$\w+',            # Dollar symbols
+        r'0x[0-9a-fA-F]+',   # Hex numbers
+        r'\d{3,}',           # Long number sequences
+    ]
+
+    # Allow time markers like [0s], [6s] etc.
+    time_marker_pattern = r'\[\d+s\]'
+    # Remove valid time markers before checking for other brackets
+    clean_script = re.sub(time_marker_pattern, '', tts_script)
+
+    for pattern in code_patterns:
+        if re.search(pattern, clean_script):
+            raise ValueError(
+                f"TTS script contains code-like patterns: {pattern}. "
+                f"TTS script must be pure Hindi narration without code, numbers, or special characters."
+            )
+
+    # Check for excessive special characters
+    special_chars = r'[{}<>$#@]'
+    if re.search(special_chars, clean_script):
+        raise ValueError(
+            f"TTS script contains special characters {special_chars}. "
+            f"TTS script must be pure Hindi narration without code or symbols."
+        )
 
 
 @dataclass
@@ -55,6 +95,8 @@ def generate_for_preview(topic: str, settings: Settings, max_retries: int = 2) -
                 api_key=settings.gemini_api_key,
                 error_feedback=last_error,
             )
+            # Validate TTS script to prevent code/symbols from leaking into audio
+            _validate_tts_script(script.tts_script_hindi)
             video_path = render_scene(script.manim_code, work_dir)
             break
         except Exception as exc:
