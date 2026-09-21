@@ -85,6 +85,8 @@ You must output two things:
    10. Do not use deprecated Manim methods or deprecated method-animation patterns
        (e.g. avoid .set_width() in animation contexts). Prefer current Manim Community
        APIs and ordinary attribute/set operations where appropriate.
+   11. Do not hallucinate non-existent Manim classes (like `Check`). If you need a checkmark,
+       use `MathTex(r'\checkmark')` or `Text('✓')`. For a cross, use `Cross()`.
 
 2. `tts_script_hindi`: a Hindi (Devanagari) narration script, mixing in
    English technical terms as needed, written the way a tech YouTuber would
