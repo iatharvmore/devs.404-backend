@@ -1,5 +1,25 @@
 {
   "job_id": "72c705fe-2b98-4747-98c9-067d3e04fda3",
   "topic": "LLM Chain of thoughts working",
-  "status": "generating"
+  "status": "ready",
+  "video_url": "https://res.cloudinary.com/dnojsxctv/video/upload/v1790008137/daves404_reels/maslnmqhjzswbbjen4bh.mp4",
+  "cloudinary_public_id": "daves404_reels/maslnmqhjzswbbjen4bh",
+  "caption": "Ever wondered how AI solves complex problems like humans do? It's called Chain of Thought! This technique teaches Large Language Models to think step-by-step, leading to more accurate and reliable answers. It's like giving AI a brain to reason.",
+  "hashtags": [
+    "#AI",
+    "#LLM",
+    "#ChainOfThought",
+    "#ArtificialIntelligence",
+    "#MachineLearning",
+    "#TechExplained",
+    "#ComputerScience",
+    "#DeepLearning",
+    "#AIinHindi",
+    "#TechReels",
+    "#AITechnology",
+    "#ProblemSolvingAI",
+    "#GenerativeAI",
+    "#AIInsights",
+    "#FutureOfAI"
+  ]
 }
