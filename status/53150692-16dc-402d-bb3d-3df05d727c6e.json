@@ -1,5 +1,6 @@
 {
   "job_id": "53150692-16dc-402d-bb3d-3df05d727c6e",
   "topic": "LLM Chain of thoughts working",
-  "status": "generating"
+  "status": "failed",
+  "error": "Traceback (most recent call last):\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/scripts/generate_job.py\", line 42, in main\n    result = generate_for_preview(topic, settings)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/pipeline.py\", line 58, in generate_for_preview\n    video_path = render_scene(script.manim_code, work_dir)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/manim_render.py\", line 52, in render_scene\n    raise FileNotFoundError(\nFileNotFoundError: Rendered mp4 not found under /home/runner/work/devs.404-backend/devs.404-backend/work/LLM_Chain_of_thoughts_working/media/videos.\nExpected scene: LLMChainOfThoughtScene.mp4\nstdout was:\n\n"
 }
