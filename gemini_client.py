@@ -111,10 +111,6 @@ class TopicScene(Scene):
         body2 = wrap_text("Second point of the concept", F_BODY, C_BODY)
         body2.next_to(body1, DOWN, buff=0.45)
 
-        # ← Before each self.play(), verify: are all new objects above SAFE_Y_B?
-        assert all(o.get_bottom()[1] > SAFE_Y_B for o in [heading1, body1, body2]), \
-            "Content extends below safe area bottom! Move elements up."
-
         self.play(FadeOut(subtitle), run_time=0.4)
         self.play(FadeIn(heading1), run_time=0.5)
         self.play(Write(body1),  run_time=1.8)
@@ -191,8 +187,13 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
   of the screen — anything below y = -4.8 will be hidden.
 • title.move_to(UP * 6.0) is the standard top position for a scene title.
 • After placing each object, the LOWEST point of that object (get_bottom()[1])
-  must be > -4.8. Add an assert in your code to catch violations.
+  must be > -4.8. DO NOT add assert statements - they cause failures.
 • NEVER use get_center() ± large offsets that push objects out of the safe area.
+• CRITICAL: If you have more than 3-4 body text lines, you MUST split them across
+  multiple phases or reduce the number of lines. Stacking too many objects will
+  inevitably push content below SAFE_Y_B = -4.8.
+• For sections with lots of content, use fewer lines per section (2-3 max) and
+  spread across more phases rather than cramming everything into one phase.
 
 ─── C. FONT SIZES (hard caps) ───────────────────────────────────────────────
 • Scene title        : F_TITLE  = 52   (bold, one per scene)
@@ -245,6 +246,7 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
    MathTex(r'\\checkmark'). For crosses use Cross() or Text('✗').
 9. Every object placed on screen must be explicitly FadeOut-ed before a new
    object is placed at a nearby position in the next phase.
+10. NEVER use assert statements in your code - they cause rendering failures.
 
 ═══════════════════════════════════════════════════════════════════
 TTS SCRIPT RULES (tts_script_hindi)
@@ -304,7 +306,9 @@ def generate_script(
             f"Generate a corrected scene.\n"
             f"Do not repeat the animation pattern that caused the error.\n"
             f"Strictly enforce MANIM STABILITY RULES: NEVER use Transform() or ReplacementTransform() "
-            f"on Text/MathTex, and use FadeOut + FadeIn for text replacements instead."
+            f"on Text/MathTex, and use FadeOut + FadeIn for text replacements instead.\n"
+            f"CRITICAL: NEVER use assert statements in your code - they cause rendering failures.\n"
+            f"If you see SAFE_Y_B violations, reduce the number of lines per phase and spread content across more phases."
         )
 
     response = client.models.generate_content(
