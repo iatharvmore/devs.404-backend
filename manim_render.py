@@ -15,7 +15,9 @@ def _extract_scene_class_name(code: str) -> str:
     match = re.search(r"class\s+(\w+)\s*\(\s*Scene\s*\)", code)
     if not match:
         raise ValueError("Could not find a Scene subclass in generated Manim code")
-    return match.group(1)
+    scene_name = match.group(1)
+    print(f"[manim_render] Extracted scene class name: {scene_name}")
+    return scene_name
 
 
 def render_scene(manim_code: str, work_dir: str | Path) -> Path:
@@ -26,6 +28,9 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
     script_path.write_text(manim_code, encoding="utf-8")
 
     scene_name = _extract_scene_class_name(manim_code)
+    print(f"[manim_render] Scene name extracted: {scene_name}")
+    print(f"[manim_render] Script path: {script_path}")
+    print(f"[manim_render] Work directory: {work_dir}")
 
     result = subprocess.run(
         [sys.executable, str(script_path)],
@@ -34,6 +39,10 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
         text=True,
         timeout=600,
     )
+
+    print(f"[manim_render] Return code: {result.returncode}")
+    print(f"[manim_render] STDOUT length: {len(result.stdout)}")
+    print(f"[manim_render] STDERR length: {len(result.stderr)}")
 
     if result.returncode != 0:
         raise RuntimeError(
@@ -46,13 +55,37 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
     # e.g. media/videos/1080p60/LLMChainOfThought.mp4
     media_root = work_dir / "media" / "videos"
 
+    print(f"[manim_render] Looking for media at: {media_root}")
+
+    # Check if media directory exists
+    if not media_root.exists():
+        raise FileNotFoundError(
+            f"Media directory not found at {media_root}.\n"
+            f"Expected scene: {scene_name}.mp4\n"
+            f"STDOUT:\n{result.stdout}\n"
+            f"STDERR:\n{result.stderr}\n"
+            f"Work directory contents: {list(work_dir.iterdir())}"
+        )
+
     candidates = list(media_root.rglob(f"{scene_name}.mp4"))
+    print(f"[manim_render] Found {len(candidates)} matching MP4 files")
 
     if not candidates:
+        # List all mp4 files that were actually created
+        all_mp4s = list(media_root.rglob("*.mp4"))
+        print(f"[manim_render] All MP4 files in media: {all_mp4s}")
+
+        # Fallback: if we have any MP4, use the most recent one
+        if all_mp4s:
+            print(f"[manim_render] Using fallback: most recent MP4 file")
+            return max(all_mp4s, key=lambda p: p.stat().st_mtime)
+
         raise FileNotFoundError(
             f"Rendered mp4 not found under {media_root}.\n"
             f"Expected scene: {scene_name}.mp4\n"
-            f"stdout was:\n{result.stdout}"
+            f"Actual MP4 files found: {all_mp4s}\n"
+            f"STDOUT:\n{result.stdout}\n"
+            f"STDERR:\n{result.stderr}"
         )
 
     return max(candidates, key=lambda p: p.stat().st_mtime)
