@@ -27,6 +27,13 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
     script_path = work_dir / "generated_scene.py"
     script_path.write_text(manim_code, encoding="utf-8")
 
+    # Validate that the script contains the required render call
+    if "scene.render()" not in manim_code and "__main__" not in manim_code:
+        raise ValueError(
+            "Generated Manim script does not contain the required scene.render() call. "
+            "The script must end with: if __name__ == '__main__': scene.render()"
+        )
+
     scene_name = _extract_scene_class_name(manim_code)
     print(f"[manim_render] Scene name extracted: {scene_name}")
     print(f"[manim_render] Script path: {script_path}")

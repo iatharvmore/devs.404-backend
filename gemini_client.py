@@ -188,6 +188,8 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 • config.pixel_height = 1920, config.pixel_width = 720
 • config.frame_height = 16.0, config.frame_width = 9.0   (9:16 vertical)
 • config.background_color = WHITE
+• CRITICAL: The if __name__ == "__main__": block at the end MUST be preserved exactly.
+  It contains scene.render() which is required for video generation.
 
 ─── B. SAFE AREA (HARD CONSTRAINTS — never exceed) ─────────────────────────
 • ALL objects must have:
@@ -249,6 +251,14 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
     Summary / CTA : 10 – 14 s
     Final hold    : 1 – 2 s
 • Total must be 55 – 70 s. Calculate by summing all run_time + wait() values.
+
+─── G.5 CRITICAL RENDERING REQUIREMENTS ─────────────────────────────────────
+• The script MUST end with the exact render call:
+  if __name__ == "__main__":
+      scene = YourClassName()
+      scene.render()
+• DO NOT modify or remove this block - it's what generates the video file.
+• DO NOT add any other code after scene.render() that would prevent execution.
 
 ─── H. STABILITY RULES (prevent runtime crashes) ────────────────────────────
 1. NEVER use Transform(), ReplacementTransform(), TransformMatchingShapes()
@@ -342,7 +352,9 @@ def generate_script(
             f"CRITICAL: If you see numbers, code symbols, or garbled text in content, ensure the TTS script "
             f"contains ONLY natural Hindi narration with NO code, numbers, or special characters.\n"
             f"CRITICAL: NEVER use non-existent Manim classes like Checkmark(), Cross(), Tick(), etc. "
-            f"For checkmarks use Text('✓'), for crosses use Text('✗'). ONLY use valid Manim classes."
+            f"For checkmarks use Text('✓'), for crosses use Text('✗'). ONLY use valid Manim classes.\n"
+            f"CRITICAL: Ensure the script ends with 'if __name__ == \"__main__\": scene.render()' - "
+            f"this is required for video generation. The render call MUST be preserved."
         )
 
     response = client.models.generate_content(
