@@ -1,5 +1,6 @@
 {
   "job_id": "f7625e4d-617e-4ba6-aa0d-f3f428302d17",
   "topic": "LLM Chain of thoughts working",
-  "status": "generating"
+  "status": "failed",
+  "error": "Traceback (most recent call last):\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/scripts/generate_job.py\", line 42, in main\n    result = generate_for_preview(topic, settings)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/pipeline.py\", line 100, in generate_for_preview\n    video_path = render_scene(script.manim_code, work_dir)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/manim_render.py\", line 62, in render_scene\n    raise FileNotFoundError(\nFileNotFoundError: Media directory not found at /home/runner/work/devs.404-backend/devs.404-backend/work/LLM_Chain_of_thoughts_working/media/videos.\nExpected scene: TopicScene.mp4\nSTDOUT:\n\nSTDERR:\n\nWork directory contents: [PosixPath('/home/runner/work/devs.404-backend/devs.404-backend/work/LLM_Chain_of_thoughts_working/generated_scene.py')]\n"
 }
