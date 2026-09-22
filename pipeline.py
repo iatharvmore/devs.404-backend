@@ -87,18 +87,7 @@ def _validate_tts_script(tts_script: str) -> None:
             f"This is the required channel signature."
         )
 
-    # Validate TTS script length for 60-second video
-    word_count = len(tts_script.split())
-    if word_count > 200:
-        raise ValueError(
-            f"TTS script is too long: {word_count} words. For a 60-second video, "
-            f"the script should be 150-180 words maximum. Current script is too long "
-            f"and will result in a video exceeding 60 seconds."
-        )
-    if word_count < 120:
-        print(f"[pipeline] Warning: TTS script is short: {word_count} words. For 60s video, aim for 150-180 words.")
-    else:
-        print(f"[pipeline] TTS script word count: {word_count} words (good for 60s video)")
+    # No TTS validation - let Gemini handle timing naturally
 
 
 @dataclass

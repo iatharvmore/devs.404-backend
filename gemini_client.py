@@ -18,8 +18,11 @@ MODEL = "gemini-2.5-flash"
 # Embed a proven skeleton the model MUST adapt, not invent from scratch.
 _MANIM_TEMPLATE = '''
 from manim import *
+import numpy as np
+import random
+from IPython.display import Video
 
-# ── CONFIG (Mobile Vertical 9:16) ───────────────────────────────────────────
+# --- CONFIG (Mobile Vertical 9:16) ---
 config.pixel_height = 1280
 config.pixel_width = 720
 config.frame_height = 16.0
@@ -27,145 +30,153 @@ config.frame_width = 9.0
 config.background_color = WHITE
 config.verbosity = "WARNING"
 
-class TopicScene(Scene):
+class ConformerASR60s(Scene):
     def construct(self):
-        # ── FIXED UI ELEMENTS (Top Zone) ───────────────────────────────────────
-        header = Text("TOPIC TITLE", color=BLACK, weight=BOLD).scale(0.75).to_edge(UP, buff=0.8)
-        subtitle = Text("Topic subtitle / description", color=GRAY_D).scale(0.38).next_to(header, DOWN)
+        # --- FIXED UI ELEMENTS (Top Zone) ---
+        header = Text("CONFORMER FOR ASR", color=BLACK, weight=BOLD).scale(0.75).to_edge(UP, buff=0.8)
+        subtitle = Text("Combining CNNs + Transformers for Speech", color=GRAY_D).scale(0.38).next_to(header, DOWN)
         
-        formula = Text("Key Formula or Concept", color=BLACK).scale(0.55).next_to(subtitle, DOWN, buff=0.5)
+        formula = MathTex(
+            r"\\text{Conformer} = \\text{CNN (Local)} + \\text{Transformer (Global)}", color=BLACK
+        ).scale(0.55).next_to(subtitle, DOWN, buff=0.5)
         
         self.add(header, subtitle, formula)
 
         # ==========================================
-        # PHASE 1: INTRODUCTION / PROBLEM (0-10s)
+        # PHASE 1: THE DILEMMA - CNN VS TRANSFORMER (0-10s)
         # ==========================================
-        # Use rectangles, text boxes to introduce the concept or problem
-        box1 = RoundedRectangle(width=3.2, height=1.6, color=BLUE_E, fill_opacity=0.15).shift(LEFT * 1.8 + DOWN * 0.8)
-        title1 = Text("Concept 1", color=BLUE_E, weight=BOLD).scale(0.5).move_to(box1.get_top() + DOWN * 0.3)
-        desc1 = Text("Description of concept 1", color=BLACK).scale(0.32).move_to(box1.get_center() + DOWN * 0.2)
-        group1 = VGroup(box1, title1, desc1)
+        cnn_box = RoundedRectangle(width=3.2, height=1.6, color=BLUE_E, fill_opacity=0.15).shift(LEFT * 1.8 + DOWN * 0.8)
+        cnn_title = Text("CNN", color=BLUE_E, weight=BOLD).scale(0.5).move_to(cnn_box.get_top() + DOWN * 0.3)
+        cnn_desc = Text("Local Acoustic\\nFeatures", color=BLACK).scale(0.32).move_to(cnn_box.get_center() + DOWN * 0.2)
+        cnn_group = VGroup(cnn_box, cnn_title, cnn_desc)
 
-        box2 = RoundedRectangle(width=3.2, height=1.6, color=PURPLE, fill_opacity=0.15).shift(RIGHT * 1.8 + DOWN * 0.8)
-        title2 = Text("Concept 2", color=PURPLE, weight=BOLD).scale(0.5).move_to(box2.get_top() + DOWN * 0.3)
-        desc2 = Text("Description of concept 2", color=BLACK).scale(0.32).move_to(box2.get_center() + DOWN * 0.2)
-        group2 = VGroup(box2, title2, desc2)
+        trans_box = RoundedRectangle(width=3.2, height=1.6, color=PURPLE, fill_opacity=0.15).shift(RIGHT * 1.8 + DOWN * 0.8)
+        trans_title = Text("Transformer", color=PURPLE, weight=BOLD).scale(0.5).move_to(trans_box.get_top() + DOWN * 0.3)
+        trans_desc = Text("Global Context &\\nDependencies", color=BLACK).scale(0.32).move_to(trans_box.get_center() + DOWN * 0.2)
+        trans_group = VGroup(trans_box, trans_title, trans_desc)
 
-        self.play(FadeIn(group1, shift=RIGHT), FadeIn(group2, shift=LEFT), run_time=3)
-        self.wait(7)
+        self.play(FadeIn(cnn_group, shift=RIGHT), FadeIn(trans_group, shift=LEFT), run_time=3)
+        self.wait(2)
 
-        # Merge or relationship transition
+        # Merge transition
         plus_sign = Text("+", color=GREEN_E, weight=BOLD).scale(0.8).move_to(DOWN * 0.8)
         self.play(
-            group1.animate.shift(RIGHT * 0.6),
-            group2.animate.shift(LEFT * 0.6),
+            cnn_group.animate.shift(RIGHT * 0.6),
+            trans_group.animate.shift(LEFT * 0.6),
             FadeIn(plus_sign),
             run_time=2
         )
         self.wait(1)
 
         # ==========================================
-        # PHASE 2: CORE MECHANISM (10-25s)
+        # PHASE 2: THE MACARON-STYLE CONFORMER BLOCK (10-25s)
         # ==========================================
-        self.play(FadeOut(group1), FadeOut(group2), FadeOut(plus_sign), run_time=1)
+        self.play(FadeOut(cnn_group), FadeOut(trans_group), FadeOut(plus_sign), run_time=1)
 
-        mechanism_title = Text("Core Mechanism / Architecture", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
-        self.play(FadeIn(mechanism_title), run_time=1)
+        block_title = Text("Macaron-Style Conformer Block", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
+        self.play(FadeIn(block_title), run_time=1)
 
-        # Vertical stack of components
-        comp1 = RoundedRectangle(width=5.5, height=0.6, color=ORANGE, fill_opacity=0.2).shift(UP * 0.4)
-        comp1_txt = Text("Component 1", color=ORANGE).scale(0.32).move_to(comp1.get_center())
+        # Vertical Macaron Modules
+        ffn1 = RoundedRectangle(width=5.5, height=0.6, color=ORANGE, fill_opacity=0.2).shift(UP * 0.4)
+        ffn1_txt = Text("Feed Forward Module (1/2)", color=ORANGE).scale(0.32).move_to(ffn1.get_center())
         
-        comp2 = RoundedRectangle(width=5.5, height=0.6, color=PURPLE, fill_opacity=0.2).shift(DOWN * 0.4)
-        comp2_txt = Text("Component 2", color=PURPLE).scale(0.32).move_to(comp2.get_center())
+        mhsa = RoundedRectangle(width=5.5, height=0.6, color=PURPLE, fill_opacity=0.2).shift(DOWN * 0.4)
+        mhsa_txt = Text("Multi-Head Self-Attention", color=PURPLE).scale(0.32).move_to(mhsa.get_center())
 
-        comp3 = RoundedRectangle(width=5.5, height=0.6, color=BLUE_E, fill_opacity=0.2).shift(DOWN * 1.2)
-        comp3_txt = Text("Component 3", color=BLUE_E).scale(0.32).move_to(comp3.get_center())
+        conv = RoundedRectangle(width=5.5, height=0.6, color=BLUE_E, fill_opacity=0.2).shift(DOWN * 1.2)
+        conv_txt = Text("Convolution Module", color=BLUE_E).scale(0.32).move_to(conv.get_center())
 
-        comp4 = RoundedRectangle(width=5.5, height=0.6, color=ORANGE, fill_opacity=0.2).shift(DOWN * 2.0)
-        comp4_txt = Text("Component 4", color=ORANGE).scale(0.32).move_to(comp4.get_center())
+        ffn2 = RoundedRectangle(width=5.5, height=0.6, color=ORANGE, fill_opacity=0.2).shift(DOWN * 2.0)
+        ffn2_txt = Text("Feed Forward Module (1/2)", color=ORANGE).scale(0.32).move_to(ffn2.get_center())
 
-        mechanism_stack = VGroup(
-            VGroup(comp1, comp1_txt),
-            VGroup(comp2, comp2_txt),
-            VGroup(comp3, comp3_txt),
-            VGroup(comp4, comp4_txt)
+        macaron_stack = VGroup(
+            VGroup(ffn1, ffn1_txt),
+            VGroup(mhsa, mhsa_txt),
+            VGroup(conv, conv_txt),
+            VGroup(ffn2, ffn2_txt)
         )
 
-        self.play(Create(mechanism_stack, lag_ratio=0.2), run_time=5)
+        self.play(Create(macaron_stack, lag_ratio=0.2), run_time=5) # 13-18s
         self.wait(2)
 
-        # Connection arrows
-        conn_line = Line(start=comp4.get_bottom() + DOWN * 0.3, end=comp1.get_top() + UP * 0.3, color=GREEN_E, stroke_width=3)
-        conn_arrow = Arrow(start=comp4.get_bottom() + DOWN * 0.3, end=comp4.get_bottom(), color=GREEN_E, stroke_width=3)
-        conn_label = Text("Connections / Flow", color=GREEN_E).scale(0.32).next_to(mechanism_stack, DOWN, buff=0.4)
+        # Residual arrows
+        res_line = Line(start=ffn2.get_bottom() + DOWN * 0.3, end=ffn1.get_top() + UP * 0.3, color=GREEN_E, stroke_width=3)
+        res_arrow = Arrow(start=ffn2.get_bottom() + DOWN * 0.3, end=ffn2.get_bottom(), color=GREEN_E, stroke_width=3)
+        res_label = Text("Residual Connections + LayerNorm", color=GREEN_E).scale(0.32).next_to(macaron_stack, DOWN, buff=0.4)
 
-        self.play(Create(conn_line), Create(conn_arrow), FadeIn(conn_label), run_time=3)
+        self.play(Create(res_line), Create(res_arrow), FadeIn(res_label), run_time=3) # 20-23s
         self.wait(2)
 
         # ==========================================
-        # PHASE 3: DEEP DIVE (25-40s)
+        # PHASE 3: DEEP DIVE INTO CONVOLUTION & ATTENTION (25-40s)
         # ==========================================
         self.play(
-            FadeOut(mechanism_stack),
-            FadeOut(conn_line),
-            FadeOut(conn_arrow),
-            FadeOut(conn_label),
-            FadeOut(mechanism_title),
+            FadeOut(macaron_stack),
+            FadeOut(res_line),
+            FadeOut(res_arrow),
+            FadeOut(res_label),
+            FadeOut(block_title),
             run_time=1
         )
 
-        detail_title = Text("Deep Dive into Key Parts", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
+        detail_title = Text("Inside the Key Modules", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
         self.play(FadeIn(detail_title), run_time=1)
 
-        # Detail boxes
-        detail1_box = RoundedRectangle(width=6.2, height=1.2, color=BLUE_E, fill_opacity=0.15).shift(UP * 0.2)
-        detail1_txt = Text("Key detail 1 explanation", color=BLUE_E).scale(0.32).move_to(detail1_box.get_center())
+        # Depthwise Conv breakdown
+        depthwise_box = RoundedRectangle(width=6.2, height=1.2, color=BLUE_E, fill_opacity=0.15).shift(UP * 0.2)
+        depthwise_txt = Text("Depthwise Separable Conv\\n(Gated Linear Units + 1D Depthwise Conv)", color=BLUE_E).scale(0.32).move_to(depthwise_box.get_center())
 
-        detail2_box = RoundedRectangle(width=6.2, height=1.2, color=PURPLE, fill_opacity=0.15).shift(DOWN * 1.3)
-        detail2_txt = Text("Key detail 2 explanation", color=PURPLE).scale(0.32).move_to(detail2_box.get_center())
+        # Relative Positional MHSA
+        rel_mhsa_box = RoundedRectangle(width=6.2, height=1.2, color=PURPLE, fill_opacity=0.15).shift(DOWN * 1.3)
+        rel_mhsa_txt = Text("Multi-Head Self-Attention\\n(Relative Positional Encoding for Speech)", color=PURPLE).scale(0.32).move_to(rel_mhsa_box.get_center())
 
-        self.play(Create(VGroup(detail1_box, detail1_txt)), run_time=3)
-        self.play(Flash(detail1_box, color=BLUE_E, line_length=0.3), run_time=1)
+        self.play(
+            Create(VGroup(depthwise_box, depthwise_txt)),
+            run_time=3
+        )
+        self.play(Flash(depthwise_box, color=BLUE_E, line_length=0.3), run_time=1)
 
-        self.play(Create(VGroup(detail2_box, detail2_txt)), run_time=3)
-        self.play(Flash(detail2_box, color=PURPLE, line_length=0.3), run_time=1)
+        self.play(
+            Create(VGroup(rel_mhsa_box, rel_mhsa_txt)),
+            run_time=3
+        )
+        self.play(Flash(rel_mhsa_box, color=PURPLE, line_length=0.3), run_time=1)
         self.wait(3)
 
         # ==========================================
-        # PHASE 4: APPLICATION / PIPELINE (40-52s)
+        # PHASE 4: END-TO-END ASR PIPELINE (40-52s)
         # ==========================================
         self.play(
-            FadeOut(VGroup(detail1_box, detail1_txt)),
-            FadeOut(VGroup(detail2_box, detail2_txt)),
+            FadeOut(VGroup(depthwise_box, depthwise_txt)),
+            FadeOut(VGroup(rel_mhsa_box, rel_mhsa_txt)),
             FadeOut(detail_title),
             run_time=1
         )
 
-        app_title = Text("Application / Pipeline", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
-        self.play(FadeIn(app_title), run_time=1)
+        pipeline_title = Text("End-to-End ASR Pipeline", color=BLACK).scale(0.42).next_to(formula, DOWN, buff=0.4)
+        self.play(FadeIn(pipeline_title), run_time=1)
 
-        # Pipeline steps
-        step1_box = Rectangle(width=5.5, height=0.6, color=GRAY_D, fill_opacity=0.2).shift(DOWN * 2.2)
-        step1_txt = Text("Step 1: Input", color=BLACK).scale(0.3).move_to(step1_box.get_center())
+        # Pipeline Flow Elements
+        spec_box = Rectangle(width=5.5, height=0.6, color=GRAY_D, fill_opacity=0.2).shift(DOWN * 2.2)
+        spec_txt = Text("1. Audio / Mel-Spectrogram Input", color=BLACK).scale(0.3).move_to(spec_box.get_center())
 
-        step2_box = Rectangle(width=5.5, height=0.6, color=TEAL, fill_opacity=0.2).shift(DOWN * 1.4)
-        step2_txt = Text("Step 2: Process", color=TEAL).scale(0.3).move_to(step2_box.get_center())
+        sub_box = Rectangle(width=5.5, height=0.6, color=TEAL, fill_opacity=0.2).shift(DOWN * 1.4)
+        sub_txt = Text("2. Convolutional Subsampling (4x Reduction)", color=TEAL).scale(0.3).move_to(sub_box.get_center())
 
-        step3_box = Rectangle(width=5.5, height=0.6, color=GREEN_E, fill_opacity=0.2).shift(DOWN * 0.6)
-        step3_txt = Text("Step 3: Core", color=GREEN_E).scale(0.3).move_to(step3_box.get_center())
+        conf_enc_box = Rectangle(width=5.5, height=0.6, color=GREEN_E, fill_opacity=0.2).shift(DOWN * 0.6)
+        conf_enc_txt = Text("3. N x Conformer Blocks (Encoder)", color=GREEN_E).scale(0.3).move_to(conf_enc_box.get_center())
 
-        step4_box = Rectangle(width=5.5, height=0.6, color=RED_E, fill_opacity=0.2).shift(UP * 0.2)
-        step4_txt = Text("Step 4: Output", color=RED_E).scale(0.3).move_to(step4_box.get_center())
+        ctc_box = Rectangle(width=5.5, height=0.6, color=RED_E, fill_opacity=0.2).shift(UP * 0.2)
+        ctc_txt = Text("4. CTC / Decoder -> Text Tokens", color=RED_E).scale(0.3).move_to(ctc_box.get_center())
 
         pipeline_stack = VGroup(
-            VGroup(step1_box, step1_txt),
-            VGroup(step2_box, step2_txt),
-            VGroup(step3_box, step3_txt),
-            VGroup(step4_box, step4_txt)
+            VGroup(spec_box, spec_txt),
+            VGroup(sub_box, sub_txt),
+            VGroup(conf_enc_box, conf_enc_txt),
+            VGroup(ctc_box, ctc_txt)
         )
 
-        self.play(Create(pipeline_stack, lag_ratio=0.2), run_time=5)
+        self.play(Create(pipeline_stack, lag_ratio=0.2), run_time=5) # 43-48s
         self.wait(2)
 
         # ==========================================
@@ -177,13 +188,14 @@ class TopicScene(Scene):
             run_time=2
         )
         
-        result_text = Text("Result / Takeaway", color=GREEN_E, weight=BOLD).scale(0.6).shift(UP * 1.2)
-        self.play(FadeIn(result_text), Flash(result_text, color=GREEN_E), run_time=2)
-        self.wait(4) # Final hold
+        output_text = Text('"Hello World"', color=GREEN_E, weight=BOLD).scale(0.6).shift(UP * 1.2)
+        self.play(FadeIn(output_text), Flash(output_text, color=GREEN_E), run_time=2)
+        self.wait(4) # CTA hold
 
-if __name__ == "__main__":
-    scene = TopicScene()
-    scene.render()
+# --- RENDER ---
+scene = ConformerASR60s()
+scene.render()
+Video(scene.renderer.file_writer.movie_file_path, embed=True)
 '''
 
 SYSTEM_INSTRUCTIONS = f"""\
@@ -213,74 +225,37 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 {_MANIM_TEMPLATE.strip()}
 ```
 
-─── A. FRAME & CONFIG (copy exactly) ───────────────────────────────────────
-• config.pixel_height = 1280, config.pixel_width = 720
-• config.frame_height = 16.0, config.frame_width = 9.0   (9:16 vertical)
-• config.background_color = WHITE
-• config.verbosity = "WARNING"
-• CRITICAL: The if __name__ == "__main__": block at the end MUST be preserved exactly.
-  It contains scene.render() which is required for video generation.
+─── A. ADAPTATION RULES ─────────────────────────────────────────────────────
+• Adapt the Conformer ASR example to your specific topic
+• Replace "CONFORMER FOR ASR" with your topic title
+• Replace specific Conformer content with your topic's content
+• Keep the exact structure, timing, and visual style from the example
+• The example produces exactly 60-second videos with matching TTS scripts
 
-─── B. ADAPTATION RULES ─────────────────────────────────────────────────────
-• Replace "TOPIC TITLE" with your actual topic
-• Replace "Topic subtitle / description" with a brief description
-• Replace "Key Formula or Concept" with a relevant formula or key concept
-• Adapt the 5 phases to your specific topic content
-• Keep the exact structure and timing of each phase
-• Maintain the visual style (rectangles, colors, animations)
-• CRITICAL: Do NOT use escape sequences like \\n or line breaks in Text content
-• CRITICAL: Keep all text on single lines to avoid syntax errors
-• CRITICAL: Do not break strings across multiple lines in your code
+─── B. TIMING RULES ────────────────────────────────────────────────────────
+• The example is exactly 60 seconds: 0-10s, 10-25s, 25-40s, 40-52s, 52-60s
+• Maintain the same timing structure for your topic
+• The TTS script in the example naturally matches the 60s video timing
 
-─── C. VISUAL ELEMENTS (use these from the template) ───────────────────────
-• RoundedRectangle, Rectangle for boxes
-• Text for all text content including formulas
-• Line, Arrow for connections
-• VGroup for grouping elements
-• FadeIn, FadeOut, Create, Flash for animations
-• Colors: BLUE_E, PURPLE, ORANGE, GREEN_E, TEAL, RED_E, GRAY_D, BLACK
-• CRITICAL: Use Text for everything including formulas - do NOT use MathTex
+─── C. VISUAL ELEMENTS ─────────────────────────────────────────────────────
+• Use the same visual style: rectangles, text boxes, animations
+• Keep the color scheme: BLUE_E, PURPLE, ORANGE, GREEN_E, TEAL, RED_E, GRAY_D, BLACK
+• Use MathTex for formulas, Text for regular content
+• Keep animations simple and effective
 
-─── D. TIMING RULES (STRICT EXACTLY 60s) ───────────────────────────────────────
-• CRITICAL: Total video length MUST be exactly 60 seconds, never more, never less.
-• Annotate every phase with its time range in a comment:  # [0s – 10s]
-• Include the wait() call that fills the remaining time in that phase.
-• Phase timing (total exactly = 60s):
-    Phase 1 (Intro/Problem)    : 0s – 10s   (10s)
-    Phase 2 (Core Mechanism)   : 10s – 25s  (15s)
-    Phase 3 (Deep Dive)       : 25s – 40s  (15s)
-    Phase 4 (Application)      : 40s – 52s  (12s)
-    Phase 5 (Outro/Result)     : 52s – 60s  (8s)
-• Calculate total by summing all run_time + wait() values = exactly 60s.
-• CRITICAL: If total exceeds 60s, reduce wait() times. If under 60s, increase wait() times.
-
-─── E. CRITICAL RENDERING REQUIREMENTS ─────────────────────────────────────
-• The script MUST end with the exact render call:
-  if __name__ == "__main__":
-      scene = TopicScene()
-      scene.render()
-• DO NOT modify or remove this block - it's what generates the video file.
-• DO NOT add any other code after scene.render() that would prevent execution.
-
-─── E. STABILITY RULES (prevent runtime crashes) ────────────────────────────
-1. ONLY use Manim classes from the template: Scene, Text, VGroup,
-   Rectangle, RoundedRectangle, Line, Arrow, FadeIn, FadeOut, Create, Flash
-2. NEVER use Transform(), ReplacementTransform(), TransformMatchingShapes()
-3. NEVER use non-existent classes: Checkmark, Cross, Tick, MathTex, etc.
-4. For symbols use Text with emoji characters
-5. Keep the exact structure of each phase from the template
-6. Always FadeOut old objects before FadeIn new ones
-7. CRITICAL: Use Text for ALL content including formulas - do NOT use escape sequences like \\n
+─── D. CRITICAL REQUIREMENTS ────────────────────────────────────────────────
+• The script MUST end with: scene = ConformerASR60s(); scene.render()
+• DO NOT modify the render block
+• The TTS script should naturally match the visual content timing
+• End with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
 
 ═══════════════════════════════════════════════════════════════════
 TTS SCRIPT RULES (tts_script_hindi)
 ═══════════════════════════════════════════════════════════════════
 
 • Written in Hindi (Devanagari script), mixing in English tech terms naturally.
-• Include time markers like [0s], [10s], [25s], [40s], [52s] at the start of each paragraph
-  to match the video phases.
-• The spoken content at each marker should describe what is CURRENTLY VISIBLE
-  on screen at that moment.
+• The TTS script should naturally match the visual content and timing (approx 60 seconds).
+• End with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
 • Total length: 2000 – 2400 characters (hard limit: 2500).
 • Style: energetic tech YouTuber — clear, concise, no filler words.
 • CRITICAL: NEVER include Manim code, variable names, function names, or any
@@ -298,13 +273,7 @@ TTS SCRIPT RULES (tts_script_hindi)
   This is the channel signature/outro.
 
 Example format:
-  [0s] Speech Recognition में लंबे समय से एक दुविधा रही है: CNNs ऑडियो के local features
-  जैसे pitch को बेहतरीन तरीके से कैच करते हैं, जबकि Transformers पूरे सेंटेंस का
-  global context समझते हैं। तो दोनों में से बेहतर कौन सा है?
-  [10s] जवाब है: Conformer Architecture! यह Model दोनों की ताकतों को मिलाकर
-  एक स्पेशल Macaron Style Block बनाता है।
-  [52s] यही वजह है कि आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं!
-  ऐसे ही AI Breakdowns के लिए अभी Follow करें devs dot four zero four ko!
+  Speech Recognition में लंबे समय से एक दुविधा रही है: Convolutional Neural Networks यानी CNNs ऑडियो के local acoustic features जैसे pitch और timbre को बेहतरीन तरीके से कैच करते हैं, जबकि Transformers पूरे सेंटेंस का global context और long range dependencies समझते हैं। तो दोनों में से बेहतर कौन सा है? जवाब है: Conformer Architecture! Google का यह Conformer Model दोनों की ताकतों को मिलाकर एक स्पेशल Macaron Style Block बनाता है। इस ब्लॉक में एक नहीं, बल्कि दो half step Feed Forward Modules के बीच में Multi Head Self Attention और Convolution Module को सैंडविच किया जाता है! इसका Convolution module Depthwise Separable Convolutions यूज़ करके स्पीच सिग्नल के लोकल पेटर्न्स प्रोसेस करता है, और Multi Head Self Attention में Relative Positional Encoding ऐड करके यह सेंटेंस के दूर-दराज शब्दों को कनेक्ट करता है। Pipeline में सबसे पहले Audio Mel Spectrogram Convolutional Subsampling के ज़रिए कम रिज़ॉल्यूशन में कंप्रेस होता है, फिर multiple Conformer blocks से गुजरकर CTC Decoder की मदद से सुपर एक्यूरेट Text Tokens जनरेट करता है! यही वजह है कि Whisper, NeMo और आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं! ऐसे ही AI Breakdowns के लिए अभी Follow करें!
 
 ═══════════════════════════════════════════════════════════════════
 OTHER OUTPUTS
@@ -357,13 +326,7 @@ def generate_script(
             f"this is required for video generation. The render call MUST be preserved.\n"
             f"CRITICAL: TTS [0s] must start with catchy topic opening, NOT 'namaste'. "
             f"Final TTS paragraph must end with 'devs dot four zero four'.\n"
-            f"CRITICAL: Total video MUST be exactly 60 seconds, never more, never less. "
-            f"Follow the template timing: Phase 1: 0-10s, Phase 2: 10-25s, Phase 3: 25-40s, Phase 4: 40-52s, Phase 5: 52-60s.\n"
-            f"CRITICAL: Calculate ALL run_time + wait() values and ensure total = exactly 60s.\n"
-            f"CRITICAL: If total exceeds 60s, reduce wait() times. If under 60s, increase wait() times.\n"
-            f"CRITICAL: Do NOT use escape sequences like \\n or line breaks in Text content. "
-            f"Keep all text on single lines to avoid syntax errors.\n"
-            f"CRITICAL: Keep animations simple and short to fit within 60s limit."
+            f"Generate a 60-second video script and matching TTS script following the working example provided in the template."
         )
 
     response = client.models.generate_content(
