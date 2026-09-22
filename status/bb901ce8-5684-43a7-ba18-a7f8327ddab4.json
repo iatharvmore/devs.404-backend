@@ -1,5 +1,6 @@
 {
   "job_id": "bb901ce8-5684-43a7-ba18-a7f8327ddab4",
   "topic": "LLM chain of thoughts working",
-  "status": "generating"
+  "status": "failed",
+  "error": "Traceback (most recent call last):\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/scripts/generate_job.py\", line 42, in main\n    result = generate_for_preview(topic, settings)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/pipeline.py\", line 128, in generate_for_preview\n    video_path = render_scene(script.manim_code, work_dir)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/manim_render.py\", line 55, in render_scene\n    raise RuntimeError(\nRuntimeError: Manim render failed:\nSTDOUT:\n\nSTDERR:\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/work/LLM_chain_of_thoughts_working/generated_scene.py\", line 29\n    problem_desc = Text(\"No Explanation, Often\n                        ^\nSyntaxError: unterminated string literal (detected at line 29)\n\n"
 }
