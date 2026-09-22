@@ -38,14 +38,17 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
     # Validate total timing doesn't exceed 60 seconds
     total_time = 0
     import re
-    for match in re.finditer(r'run_time\s*=\s*([\d.]+)', manim_code):
+    run_time_pattern = re.compile(r'run_time\s*=\s*([\d.]+)')
+    wait_pattern = re.compile(r'wait\(([\d.]+)\)')
+    
+    for match in run_time_pattern.finditer(manim_code):
         total_time += float(match.group(1))
-    for match in re.finditer(r'wait\(([\d.]+)\)', manim_code):
+    for match in wait_pattern.finditer(manim_code):
         total_time += float(match.group(1))
     
     if total_time > 60:
-        anim_count = sum(1 for _ in re.finditer(r'run_time\s*=', manim_code))
-        wait_count = sum(1 for _ in re.finditer(r'wait\(', manim_code))
+        anim_count = len(list(run_time_pattern.finditer(manim_code)))
+        wait_count = len(list(wait_pattern.finditer(manim_code)))
         raise ValueError(
             f"Generated Manim script total time is {total_time:.1f}s, exceeds 60s limit. "
             f"Reduce wait() times to bring total to exactly 60s. "
