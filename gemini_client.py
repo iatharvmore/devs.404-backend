@@ -202,88 +202,18 @@ SYSTEM_INSTRUCTIONS = f"""\
 You write content for an Instagram Reels channel called dev's.404 that
 explains AI / computer science topics in ~60 seconds.
 
-═══════════════════════════════════════════════════════════════════
-STEP 1 — DESIGN THE MANIM SCENE FIRST, then write the TTS script.
-═══════════════════════════════════════════════════════════════════
-
-You MUST follow this order:
-  A. Design the Manim animation phase-by-phase.
-  B. For every phase, write a comment  # [Xs – Ys]  showing the start and end
-     second, calculated from:  sum of all animation run_time + self.wait()
-     values for that phase.
-  C. ONLY after the full Manim code is complete, write the `tts_script_hindi`
-     where EVERY paragraph is prefixed with a time marker like  [0s] , [8s]
-     so the spoken word matches the visible content.
-
-═══════════════════════════════════════════════════════════════════
-MANIM CODE RULES  (violating any rule = broken render = wasted job)
-═══════════════════════════════════════════════════════════════════
-
-START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
+Adapt the following working example to the new topic:
 
 ```python
 {_MANIM_TEMPLATE.strip()}
 ```
 
-─── A. ADAPTATION RULES ─────────────────────────────────────────────────────
-• Adapt the Conformer ASR example to your specific topic
-• Replace "CONFORMER FOR ASR" with your topic title
-• Replace specific Conformer content with your topic's content
-• Keep the exact structure, timing, and visual style from the example
-• The example produces exactly 60-second videos with matching TTS scripts
-
-─── B. TIMING RULES ────────────────────────────────────────────────────────
-• The example is exactly 60 seconds: 0-10s, 10-25s, 25-40s, 40-52s, 52-60s
-• Maintain the same timing structure for your topic
-• The TTS script in the example naturally matches the 60s video timing
-
-─── C. VISUAL ELEMENTS ─────────────────────────────────────────────────────
-• Use the same visual style: rectangles, text boxes, animations
-• Keep the color scheme: BLUE_E, PURPLE, ORANGE, GREEN_E, TEAL, RED_E, GRAY_D, BLACK
-• Use MathTex for formulas, Text for regular content
-• Keep animations simple and effective
-
-─── D. CRITICAL REQUIREMENTS ────────────────────────────────────────────────
-• The script MUST end with: scene = ConformerASR60s(); scene.render()
-• DO NOT modify the render block
-• The TTS script should naturally match the visual content timing
-• End with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
-
-═══════════════════════════════════════════════════════════════════
-TTS SCRIPT RULES (tts_script_hindi)
-═══════════════════════════════════════════════════════════════════
-
-• Written in Hindi (Devanagari script), mixing in English tech terms naturally.
-• The TTS script should naturally match the visual content and timing (approx 60 seconds).
-• End with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
-• Total length: 2000 – 2400 characters (hard limit: 2500).
-• Style: energetic tech YouTuber — clear, concise, no filler words.
-• CRITICAL: NEVER include Manim code, variable names, function names, or any
-  programming syntax in the TTS script. This is for spoken Hindi narration only.
-• CRITICAL: NEVER include numbers, special characters, or code symbols like
-  "#", "$", "{", "}", "()", etc. in the spoken content. Use natural language.
-• CRITICAL: The TTS script must be pure narration text — no formatting, no
-  code comments, no technical jargon that would be read literally.
-• CRITICAL: Do NOT repeat the exact text shown on screen. Describe it naturally
-  in Hindi as if explaining to a viewer.
-• CRITICAL: The [0s] paragraph MUST start with a catchy opening related to the topic,
-  NOT with "namaste" or "hello". Start with something like "Did you know..." or
-  "Imagine if..." or directly introduce the concept.
-• CRITICAL: The final paragraph MUST end with "devs dot four zero four" exactly.
-  This is the channel signature/outro.
-
-Example format:
-  Speech Recognition में लंबे समय से एक दुविधा रही है: Convolutional Neural Networks यानी CNNs ऑडियो के local acoustic features जैसे pitch और timbre को बेहतरीन तरीके से कैच करते हैं, जबकि Transformers पूरे सेंटेंस का global context और long range dependencies समझते हैं। तो दोनों में से बेहतर कौन सा है? जवाब है: Conformer Architecture! Google का यह Conformer Model दोनों की ताकतों को मिलाकर एक स्पेशल Macaron Style Block बनाता है। इस ब्लॉक में एक नहीं, बल्कि दो half step Feed Forward Modules के बीच में Multi Head Self Attention और Convolution Module को सैंडविच किया जाता है! इसका Convolution module Depthwise Separable Convolutions यूज़ करके स्पीच सिग्नल के लोकल पेटर्न्स प्रोसेस करता है, और Multi Head Self Attention में Relative Positional Encoding ऐड करके यह सेंटेंस के दूर-दराज शब्दों को कनेक्ट करता है। Pipeline में सबसे पहले Audio Mel Spectrogram Convolutional Subsampling के ज़रिए कम रिज़ॉल्यूशन में कंप्रेस होता है, फिर multiple Conformer blocks से गुजरकर CTC Decoder की मदद से सुपर एक्यूरेट Text Tokens जनरेट करता है! यही वजह है कि Whisper, NeMo और आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं! ऐसे ही AI Breakdowns के लिए अभी Follow करें!
-
-═══════════════════════════════════════════════════════════════════
-OTHER OUTPUTS
-═══════════════════════════════════════════════════════════════════
-
-3. `caption`: a short, punchy Instagram caption (1-3 sentences, English,
-   can mix a little Hindi/Hinglish) — NO hashtags in it.
-
-4. `hashtags`: 8-15 relevant strings (each starting with #, no spaces),
-   mixing broad (#ai, #computerscience, #tech) with topic-specific ones.
+Instructions:
+1. Replace Conformer ASR content with the new topic content
+2. Keep the exact structure, timing (0-10s, 10-25s, 25-40s, 40-52s, 52-60s), and visual style
+3. Keep the render block exactly as: scene = ConformerASR60s(); scene.render()
+4. Generate a matching Hindi TTS script (approx 60 seconds) that ends with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
+5. Generate a short caption and relevant hashtags
 
 Return ONLY the JSON object matching the given schema — no markdown fences,
 no commentary.
@@ -307,26 +237,10 @@ def generate_script(
 
     user_prompt = f"Topic for today's reel: {topic}"
     if error_feedback:
-        error_snippet = error_feedback[-2500:] if len(error_feedback) > 2500 else error_feedback
+        error_snippet = error_feedback[-1000:] if len(error_feedback) > 1000 else error_feedback
         user_prompt += (
-            f"\n\nCRITICAL FIX REQUIRED:\n"
-            f"The previous Manim scene failed during rendering.\n\n"
-            f"Rendering error:\n{error_snippet}\n\n"
-            f"Generate a corrected scene.\n"
-            f"Do not repeat the animation pattern that caused the error.\n"
-            f"Strictly enforce MANIM STABILITY RULES: NEVER use Transform() or ReplacementTransform() "
-            f"on Text/MathTex, and use FadeOut + FadeIn for text replacements instead.\n"
-            f"CRITICAL: NEVER use assert statements in your code - they cause rendering failures.\n"
-            f"If you see SAFE_Y_B violations, reduce the number of lines per phase and spread content across more phases.\n"
-            f"CRITICAL: If you see numbers, code symbols, or garbled text in content, ensure the TTS script "
-            f"contains ONLY natural Hindi narration with NO code, numbers, or special characters.\n"
-            f"CRITICAL: NEVER use non-existent Manim classes like Checkmark(), Cross(), Tick(), etc. "
-            f"For checkmarks use Text('✓'), for crosses use Text('✗'). ONLY use valid Manim classes.\n"
-            f"CRITICAL: Ensure the script ends with 'if __name__ == \"__main__\": scene.render()' - "
-            f"this is required for video generation. The render call MUST be preserved.\n"
-            f"CRITICAL: TTS [0s] must start with catchy topic opening, NOT 'namaste'. "
-            f"Final TTS paragraph must end with 'devs dot four zero four'.\n"
-            f"Generate a 60-second video script and matching TTS script following the working example provided in the template."
+            f"\n\nPrevious rendering error:\n{error_snippet}\n\n"
+            f"Fix the issue and try again following the working example structure."
         )
 
     response = client.models.generate_content(
