@@ -38,7 +38,7 @@ class TopicScene(Scene):
         self.add(header, subtitle, formula)
 
         # ==========================================
-        # PHASE 1: INTRODUCTION / PROBLEM (0-8s)
+        # PHASE 1: INTRODUCTION / PROBLEM (0-10s)
         # ==========================================
         # Use rectangles, text boxes to introduce the concept or problem
         box1 = RoundedRectangle(width=3.2, height=1.6, color=BLUE_E, fill_opacity=0.15).shift(LEFT * 1.8 + DOWN * 0.8)
@@ -52,7 +52,7 @@ class TopicScene(Scene):
         group2 = VGroup(box2, title2, desc2)
 
         self.play(FadeIn(group1, shift=RIGHT), FadeIn(group2, shift=LEFT), run_time=3)
-        self.wait(5)
+        self.wait(7)
 
         # Merge or relationship transition
         plus_sign = Text("+", color=GREEN_E, weight=BOLD).scale(0.8).move_to(DOWN * 0.8)
@@ -65,7 +65,7 @@ class TopicScene(Scene):
         self.wait(1)
 
         # ==========================================
-        # PHASE 2: CORE MECHANISM (8-22s)
+        # PHASE 2: CORE MECHANISM (10-25s)
         # ==========================================
         self.play(FadeOut(group1), FadeOut(group2), FadeOut(plus_sign), run_time=1)
 
@@ -92,19 +92,19 @@ class TopicScene(Scene):
             VGroup(comp4, comp4_txt)
         )
 
-        self.play(Create(mechanism_stack, lag_ratio=0.2), run_time=4)
-        self.wait(1)
+        self.play(Create(mechanism_stack, lag_ratio=0.2), run_time=5)
+        self.wait(2)
 
         # Connection arrows
         conn_line = Line(start=comp4.get_bottom() + DOWN * 0.3, end=comp1.get_top() + UP * 0.3, color=GREEN_E, stroke_width=3)
         conn_arrow = Arrow(start=comp4.get_bottom() + DOWN * 0.3, end=comp4.get_bottom(), color=GREEN_E, stroke_width=3)
         conn_label = Text("Connections / Flow", color=GREEN_E).scale(0.32).next_to(mechanism_stack, DOWN, buff=0.4)
 
-        self.play(Create(conn_line), Create(conn_arrow), FadeIn(conn_label), run_time=2)
-        self.wait(5)
+        self.play(Create(conn_line), Create(conn_arrow), FadeIn(conn_label), run_time=3)
+        self.wait(2)
 
         # ==========================================
-        # PHASE 3: DEEP DIVE (22-36s)
+        # PHASE 3: DEEP DIVE (25-40s)
         # ==========================================
         self.play(
             FadeOut(mechanism_stack),
@@ -130,10 +130,10 @@ class TopicScene(Scene):
 
         self.play(Create(VGroup(detail2_box, detail2_txt)), run_time=3)
         self.play(Flash(detail2_box, color=PURPLE, line_length=0.3), run_time=1)
-        self.wait(4)
+        self.wait(3)
 
         # ==========================================
-        # PHASE 4: APPLICATION / PIPELINE (36-48s)
+        # PHASE 4: APPLICATION / PIPELINE (40-52s)
         # ==========================================
         self.play(
             FadeOut(VGroup(detail1_box, detail1_txt)),
@@ -166,10 +166,10 @@ class TopicScene(Scene):
         )
 
         self.play(Create(pipeline_stack, lag_ratio=0.2), run_time=5)
-        self.wait(5)
+        self.wait(2)
 
         # ==========================================
-        # PHASE 5: OUTRO & RESULT (48-60s)
+        # PHASE 5: OUTRO & RESULT (52-60s)
         # ==========================================
         self.play(
             pipeline_stack[2][0].animate.set_fill(color=GREEN_E, opacity=0.8),
@@ -179,7 +179,7 @@ class TopicScene(Scene):
         
         result_text = Text("Result / Takeaway", color=GREEN_E, weight=BOLD).scale(0.6).shift(UP * 1.2)
         self.play(FadeIn(result_text), Flash(result_text, color=GREEN_E), run_time=2)
-        self.wait(3) # Final hold
+        self.wait(4) # Final hold
 
 if __name__ == "__main__":
     scene = TopicScene()
@@ -241,18 +241,18 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 • Colors: BLUE_E, PURPLE, ORANGE, GREEN_E, TEAL, RED_E, GRAY_D, BLACK
 • CRITICAL: Use Text for everything including formulas - do NOT use MathTex
 
-─── D. TIMING RULES (STRICT MAXIMUM 60s) ─────────────────────────────────────
-• CRITICAL: Total video length MUST be maximum 60 seconds, NEVER exceed 60s.
+─── D. TIMING RULES (STRICT EXACTLY 60s) ───────────────────────────────────────
+• CRITICAL: Total video length MUST be exactly 60 seconds, never more, never less.
 • Annotate every phase with its time range in a comment:  # [0s – 10s]
 • Include the wait() call that fills the remaining time in that phase.
-• Phase timing (total maximum = 60s):
-    Phase 1 (Intro/Problem)    : 0s – 8s    (8s)
-    Phase 2 (Core Mechanism)   : 8s – 22s   (14s)
-    Phase 3 (Deep Dive)       : 22s – 36s  (14s)
-    Phase 4 (Application)      : 36s – 48s  (12s)
-    Phase 5 (Outro/Result)     : 48s – 60s  (12s)
-• Calculate total by summing all run_time + wait() values, MUST be <= 60s.
-• Better to end slightly under 60s than exceed it.
+• Phase timing (total exactly = 60s):
+    Phase 1 (Intro/Problem)    : 0s – 10s   (10s)
+    Phase 2 (Core Mechanism)   : 10s – 25s  (15s)
+    Phase 3 (Deep Dive)       : 25s – 40s  (15s)
+    Phase 4 (Application)      : 40s – 52s  (12s)
+    Phase 5 (Outro/Result)     : 52s – 60s  (8s)
+• Calculate total by summing all run_time + wait() values = exactly 60s.
+• CRITICAL: If total exceeds 60s, reduce wait() times. If under 60s, increase wait() times.
 
 ─── E. CRITICAL RENDERING REQUIREMENTS ─────────────────────────────────────
 • The script MUST end with the exact render call:
@@ -356,11 +356,14 @@ def generate_script(
             f"this is required for video generation. The render call MUST be preserved.\n"
             f"CRITICAL: TTS [0s] must start with catchy topic opening, NOT 'namaste'. "
             f"Final TTS paragraph must end with 'devs dot four zero four'.\n"
-            f"CRITICAL: Total video MUST be maximum 60 seconds, NEVER exceed 60s. "
-            f"Follow the template timing: Phase 1: 0-8s, Phase 2: 8-22s, Phase 3: 22-36s, Phase 4: 36-48s, Phase 5: 48-60s.\n"
+            f"CRITICAL: Total video MUST be exactly 60 seconds, never more, never less. "
+            f"Follow the template timing: Phase 1: 0-10s, Phase 2: 10-25s, Phase 3: 25-40s, Phase 4: 40-52s, Phase 5: 52-60s.\n"
+            f"CRITICAL: Calculate ALL run_time + wait() values and ensure total = exactly 60s.\n"
+            f"CRITICAL: If total exceeds 60s, reduce wait() times. If under 60s, increase wait() times.\n"
             f"CRITICAL: Do NOT use escape sequences like \\n or line breaks in Text content. "
             f"Keep all text on single lines to avoid syntax errors.\n"
-            f"CRITICAL: TTS script MUST be pure narration with NO time markers like [0s], [10s], etc."
+            f"CRITICAL: TTS script MUST be pure narration with NO time markers like [0s], [10s], etc.\n"
+            f"CRITICAL: Keep animations simple and short to fit within 60s limit."
         )
 
     response = client.models.generate_content(

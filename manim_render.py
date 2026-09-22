@@ -35,6 +35,27 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
             f"This indicates the Gemini model broke the template syntax."
         )
 
+    # Validate total timing doesn't exceed 60 seconds
+    total_time = 0
+    import re
+    for match in re.finditer(r'run_time\s*=\s*([\d.]+)', manim_code):
+        total_time += float(match.group(1))
+    for match in re.finditer(r'wait\(([\d.]+)\)', manim_code):
+        total_time += float(match.group(1))
+    
+    if total_time > 60:
+        raise ValueError(
+            f"Generated Manim script total time is {total_time:.1f}s, exceeds 60s limit. "
+            f"Reduce wait() times to bring total to exactly 60s. "
+            f"Current breakdown: found {sum(1 for _ in re.finditer(r'run_time\s*=', manim_code))} animations "
+            f"and {sum(1 for _ in re.finditer(r'wait\(', manim_code))} waits."
+        )
+    
+    if total_time < 55:
+        print(f"[manim_render] Warning: Total time is {total_time:.1f}s, should be closer to 60s")
+    else:
+        print(f"[manim_render] Total time: {total_time:.1f}s")
+
     script_path = work_dir / "generated_scene.py"
     script_path.write_text(manim_code, encoding="utf-8")
 
