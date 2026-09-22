@@ -38,7 +38,7 @@ class TopicScene(Scene):
         self.add(header, subtitle, formula)
 
         # ==========================================
-        # PHASE 1: INTRODUCTION / PROBLEM (0-10s)
+        # PHASE 1: INTRODUCTION / PROBLEM (0-8s)
         # ==========================================
         # Use rectangles, text boxes to introduce the concept or problem
         box1 = RoundedRectangle(width=3.2, height=1.6, color=BLUE_E, fill_opacity=0.15).shift(LEFT * 1.8 + DOWN * 0.8)
@@ -52,7 +52,7 @@ class TopicScene(Scene):
         group2 = VGroup(box2, title2, desc2)
 
         self.play(FadeIn(group1, shift=RIGHT), FadeIn(group2, shift=LEFT), run_time=3)
-        self.wait(2)
+        self.wait(5)
 
         # Merge or relationship transition
         plus_sign = Text("+", color=GREEN_E, weight=BOLD).scale(0.8).move_to(DOWN * 0.8)
@@ -65,7 +65,7 @@ class TopicScene(Scene):
         self.wait(1)
 
         # ==========================================
-        # PHASE 2: CORE MECHANISM (10-25s)
+        # PHASE 2: CORE MECHANISM (8-22s)
         # ==========================================
         self.play(FadeOut(group1), FadeOut(group2), FadeOut(plus_sign), run_time=1)
 
@@ -92,19 +92,19 @@ class TopicScene(Scene):
             VGroup(comp4, comp4_txt)
         )
 
-        self.play(Create(mechanism_stack, lag_ratio=0.2), run_time=5)
-        self.wait(2)
+        self.play(Create(mechanism_stack, lag_ratio=0.2), run_time=4)
+        self.wait(1)
 
         # Connection arrows
         conn_line = Line(start=comp4.get_bottom() + DOWN * 0.3, end=comp1.get_top() + UP * 0.3, color=GREEN_E, stroke_width=3)
         conn_arrow = Arrow(start=comp4.get_bottom() + DOWN * 0.3, end=comp4.get_bottom(), color=GREEN_E, stroke_width=3)
         conn_label = Text("Connections / Flow", color=GREEN_E).scale(0.32).next_to(mechanism_stack, DOWN, buff=0.4)
 
-        self.play(Create(conn_line), Create(conn_arrow), FadeIn(conn_label), run_time=3)
-        self.wait(2)
+        self.play(Create(conn_line), Create(conn_arrow), FadeIn(conn_label), run_time=2)
+        self.wait(5)
 
         # ==========================================
-        # PHASE 3: DEEP DIVE (25-40s)
+        # PHASE 3: DEEP DIVE (22-36s)
         # ==========================================
         self.play(
             FadeOut(mechanism_stack),
@@ -130,10 +130,10 @@ class TopicScene(Scene):
 
         self.play(Create(VGroup(detail2_box, detail2_txt)), run_time=3)
         self.play(Flash(detail2_box, color=PURPLE, line_length=0.3), run_time=1)
-        self.wait(3)
+        self.wait(4)
 
         # ==========================================
-        # PHASE 4: APPLICATION / PIPELINE (40-52s)
+        # PHASE 4: APPLICATION / PIPELINE (36-48s)
         # ==========================================
         self.play(
             FadeOut(VGroup(detail1_box, detail1_txt)),
@@ -166,10 +166,10 @@ class TopicScene(Scene):
         )
 
         self.play(Create(pipeline_stack, lag_ratio=0.2), run_time=5)
-        self.wait(2)
+        self.wait(5)
 
         # ==========================================
-        # PHASE 5: OUTRO & RESULT (52-60s)
+        # PHASE 5: OUTRO & RESULT (48-60s)
         # ==========================================
         self.play(
             pipeline_stack[2][0].animate.set_fill(color=GREEN_E, opacity=0.8),
@@ -179,7 +179,7 @@ class TopicScene(Scene):
         
         result_text = Text("Result / Takeaway", color=GREEN_E, weight=BOLD).scale(0.6).shift(UP * 1.2)
         self.play(FadeIn(result_text), Flash(result_text, color=GREEN_E), run_time=2)
-        self.wait(4) # Final hold
+        self.wait(3) # Final hold
 
 if __name__ == "__main__":
     scene = TopicScene()
@@ -241,17 +241,18 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 • Colors: BLUE_E, PURPLE, ORANGE, GREEN_E, TEAL, RED_E, GRAY_D, BLACK
 • CRITICAL: Use Text for everything including formulas - do NOT use MathTex
 
-─── D. TIMING RULES (STRICT 60s) ────────────────────────────────────────────
-• CRITICAL: Total video length MUST be exactly 60 seconds, no more, no less.
+─── D. TIMING RULES (STRICT MAXIMUM 60s) ─────────────────────────────────────
+• CRITICAL: Total video length MUST be maximum 60 seconds, NEVER exceed 60s.
 • Annotate every phase with its time range in a comment:  # [0s – 10s]
 • Include the wait() call that fills the remaining time in that phase.
-• Phase timing (total = 60s):
-    Phase 1 (Intro/Problem)    : 0s – 10s   (10s)
-    Phase 2 (Core Mechanism)   : 10s – 25s  (15s)
-    Phase 3 (Deep Dive)       : 25s – 40s  (15s)
-    Phase 4 (Application)      : 40s – 52s  (12s)
-    Phase 5 (Outro/Result)     : 52s – 60s  (8s)
-• Calculate total by summing all run_time + wait() values = exactly 60s.
+• Phase timing (total maximum = 60s):
+    Phase 1 (Intro/Problem)    : 0s – 8s    (8s)
+    Phase 2 (Core Mechanism)   : 8s – 22s   (14s)
+    Phase 3 (Deep Dive)       : 22s – 36s  (14s)
+    Phase 4 (Application)      : 36s – 48s  (12s)
+    Phase 5 (Outro/Result)     : 48s – 60s  (12s)
+• Calculate total by summing all run_time + wait() values, MUST be <= 60s.
+• Better to end slightly under 60s than exceed it.
 
 ─── E. CRITICAL RENDERING REQUIREMENTS ─────────────────────────────────────
 • The script MUST end with the exact render call:
@@ -276,10 +277,9 @@ TTS SCRIPT RULES (tts_script_hindi)
 ═══════════════════════════════════════════════════════════════════
 
 • Written in Hindi (Devanagari script), mixing in English tech terms naturally.
-• EVERY paragraph must start with a time marker:  [0s]  [6s]  [22s]  etc.
-  The second values must match the phase start seconds from your Manim code.
-• The spoken content at each marker should describe what is CURRENTLY VISIBLE
-  on screen at that moment.
+• CRITICAL: The TTS script MUST be pure narration text - NO time markers like [0s], [10s], etc.
+  Time markers are only for your reference to match the video phases, not for audio.
+• The spoken content should naturally flow with the visual content on screen.
 • Total length: 2000 – 2400 characters (hard limit: 2500).
 • Style: energetic tech YouTuber — clear, concise, no filler words.
 • CRITICAL: NEVER include Manim code, variable names, function names, or any
@@ -297,12 +297,12 @@ TTS SCRIPT RULES (tts_script_hindi)
   This is the channel signature/outro.
 
 Example format:
-  [0s] Speech Recognition में लंबे समय से एक दुविधा रही है: CNNs ऑडियो के local features
+  Speech Recognition में लंबे समय से एक दुविधा रही है: CNNs ऑडियो के local features
   जैसे pitch को बेहतरीन तरीके से कैच करते हैं, जबकि Transformers पूरे सेंटेंस का
   global context समझते हैं। तो दोनों में से बेहतर कौन सा है?
-  [10s] जवाब है: Conformer Architecture! यह Model दोनों की ताकतों को मिलाकर
+  जवाब है: Conformer Architecture! यह Model दोनों की ताकतों को मिलाकर
   एक स्पेशल Macaron Style Block बनाता है।
-  [52s] यही वजह है कि आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं!
+  यही वजह है कि आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं!
   ऐसे ही AI Breakdowns के लिए अभी Follow करें devs dot four zero four ko!
 
 ═══════════════════════════════════════════════════════════════════
@@ -356,10 +356,11 @@ def generate_script(
             f"this is required for video generation. The render call MUST be preserved.\n"
             f"CRITICAL: TTS [0s] must start with catchy topic opening, NOT 'namaste'. "
             f"Final TTS paragraph must end with 'devs dot four zero four'.\n"
-            f"CRITICAL: Total video MUST be exactly 60 seconds. Follow the template timing: "
-            f"Phase 1: 0-10s, Phase 2: 10-25s, Phase 3: 25-40s, Phase 4: 40-52s, Phase 5: 52-60s.\n"
+            f"CRITICAL: Total video MUST be maximum 60 seconds, NEVER exceed 60s. "
+            f"Follow the template timing: Phase 1: 0-8s, Phase 2: 8-22s, Phase 3: 22-36s, Phase 4: 36-48s, Phase 5: 48-60s.\n"
             f"CRITICAL: Do NOT use escape sequences like \\n or line breaks in Text content. "
-            f"Keep all text on single lines to avoid syntax errors."
+            f"Keep all text on single lines to avoid syntax errors.\n"
+            f"CRITICAL: TTS script MUST be pure narration with NO time markers like [0s], [10s], etc."
         )
 
     response = client.models.generate_content(

@@ -87,14 +87,12 @@ def _validate_tts_script(tts_script: str) -> None:
             f"This is the required channel signature."
         )
 
-    # Check for proper time markers matching the 60s template
-    required_markers = ['[0s]', '[10s]', '[25s]', '[40s]', '[52s]']
-    for marker in required_markers:
-        if marker not in tts_script:
-            raise ValueError(
-                f"TTS script must include time marker {marker} to match 60s template. "
-                f"Required markers: {required_markers}"
-            )
+    # Validate that TTS script doesn't contain time markers
+    if '[' in tts_script and 's]' in tts_script:
+        raise ValueError(
+            "TTS script must be pure narration without time markers like [0s], [10s], etc. "
+            "Time markers are only for reference, not for audio generation."
+        )
 
 
 @dataclass
