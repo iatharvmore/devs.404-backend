@@ -277,9 +277,10 @@ TTS SCRIPT RULES (tts_script_hindi)
 ═══════════════════════════════════════════════════════════════════
 
 • Written in Hindi (Devanagari script), mixing in English tech terms naturally.
-• CRITICAL: The TTS script MUST be pure narration text - NO time markers like [0s], [10s], etc.
-  Time markers are only for your reference to match the video phases, not for audio.
-• The spoken content should naturally flow with the visual content on screen.
+• Include time markers like [0s], [10s], [25s], [40s], [52s] at the start of each paragraph
+  to match the video phases.
+• The spoken content at each marker should describe what is CURRENTLY VISIBLE
+  on screen at that moment.
 • Total length: 2000 – 2400 characters (hard limit: 2500).
 • Style: energetic tech YouTuber — clear, concise, no filler words.
 • CRITICAL: NEVER include Manim code, variable names, function names, or any
@@ -297,12 +298,12 @@ TTS SCRIPT RULES (tts_script_hindi)
   This is the channel signature/outro.
 
 Example format:
-  Speech Recognition में लंबे समय से एक दुविधा रही है: CNNs ऑडियो के local features
+  [0s] Speech Recognition में लंबे समय से एक दुविधा रही है: CNNs ऑडियो के local features
   जैसे pitch को बेहतरीन तरीके से कैच करते हैं, जबकि Transformers पूरे सेंटेंस का
   global context समझते हैं। तो दोनों में से बेहतर कौन सा है?
-  जवाब है: Conformer Architecture! यह Model दोनों की ताकतों को मिलाकर
+  [10s] जवाब है: Conformer Architecture! यह Model दोनों की ताकतों को मिलाकर
   एक स्पेशल Macaron Style Block बनाता है।
-  यही वजह है कि आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं!
+  [52s] यही वजह है कि आधुनिक ASR सिस्टम्स Conformer का यूज़ करते हैं!
   ऐसे ही AI Breakdowns के लिए अभी Follow करें devs dot four zero four ko!
 
 ═══════════════════════════════════════════════════════════════════
@@ -362,7 +363,6 @@ def generate_script(
             f"CRITICAL: If total exceeds 60s, reduce wait() times. If under 60s, increase wait() times.\n"
             f"CRITICAL: Do NOT use escape sequences like \\n or line breaks in Text content. "
             f"Keep all text on single lines to avoid syntax errors.\n"
-            f"CRITICAL: TTS script MUST be pure narration with NO time markers like [0s], [10s], etc.\n"
             f"CRITICAL: Keep animations simple and short to fit within 60s limit."
         )
 

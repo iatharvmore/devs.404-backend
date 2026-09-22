@@ -87,13 +87,6 @@ def _validate_tts_script(tts_script: str) -> None:
             f"This is the required channel signature."
         )
 
-    # Validate that TTS script doesn't contain time markers
-    if '[' in tts_script and 's]' in tts_script:
-        raise ValueError(
-            "TTS script must be pure narration without time markers like [0s], [10s], etc. "
-            "Time markers are only for reference, not for audio generation."
-        )
-
     # Validate TTS script length for 60-second video
     word_count = len(tts_script.split())
     if word_count > 200:
