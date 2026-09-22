@@ -24,6 +24,17 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
     work_dir = Path(work_dir).expanduser().resolve()
     work_dir.mkdir(parents=True, exist_ok=True)
 
+    # Validate Python syntax before writing the file
+    try:
+        compile(manim_code, '<string>', 'exec')
+    except SyntaxError as e:
+        raise ValueError(
+            f"Generated Manim script has syntax errors:\n"
+            f"Line {e.lineno}: {e.msg}\n"
+            f"Line content: {e.text if hasattr(e, 'text') else 'N/A'}\n"
+            f"This indicates the Gemini model broke the template syntax."
+        )
+
     script_path = work_dir / "generated_scene.py"
     script_path.write_text(manim_code, encoding="utf-8")
 

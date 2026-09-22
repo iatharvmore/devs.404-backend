@@ -33,9 +33,7 @@ class TopicScene(Scene):
         header = Text("TOPIC TITLE", color=BLACK, weight=BOLD).scale(0.75).to_edge(UP, buff=0.8)
         subtitle = Text("Topic subtitle / description", color=GRAY_D).scale(0.38).next_to(header, DOWN)
         
-        formula = MathTex(
-            r"\\text{Key Formula or Concept}", color=BLACK
-        ).scale(0.55).next_to(subtitle, DOWN, buff=0.5)
+        formula = Text("Key Formula or Concept", color=BLACK).scale(0.55).next_to(subtitle, DOWN, buff=0.5)
         
         self.add(header, subtitle, formula)
 
@@ -45,12 +43,12 @@ class TopicScene(Scene):
         # Use rectangles, text boxes to introduce the concept or problem
         box1 = RoundedRectangle(width=3.2, height=1.6, color=BLUE_E, fill_opacity=0.15).shift(LEFT * 1.8 + DOWN * 0.8)
         title1 = Text("Concept 1", color=BLUE_E, weight=BOLD).scale(0.5).move_to(box1.get_top() + DOWN * 0.3)
-        desc1 = Text("Description of\\nconcept 1", color=BLACK).scale(0.32).move_to(box1.get_center() + DOWN * 0.2)
+        desc1 = Text("Description of concept 1", color=BLACK).scale(0.32).move_to(box1.get_center() + DOWN * 0.2)
         group1 = VGroup(box1, title1, desc1)
 
         box2 = RoundedRectangle(width=3.2, height=1.6, color=PURPLE, fill_opacity=0.15).shift(RIGHT * 1.8 + DOWN * 0.8)
         title2 = Text("Concept 2", color=PURPLE, weight=BOLD).scale(0.5).move_to(box2.get_top() + DOWN * 0.3)
-        desc2 = Text("Description of\\nconcept 2", color=BLACK).scale(0.32).move_to(box2.get_center() + DOWN * 0.2)
+        desc2 = Text("Description of concept 2", color=BLACK).scale(0.32).move_to(box2.get_center() + DOWN * 0.2)
         group2 = VGroup(box2, title2, desc2)
 
         self.play(FadeIn(group1, shift=RIGHT), FadeIn(group2, shift=LEFT), run_time=3)
@@ -122,10 +120,10 @@ class TopicScene(Scene):
 
         # Detail boxes
         detail1_box = RoundedRectangle(width=6.2, height=1.2, color=BLUE_E, fill_opacity=0.15).shift(UP * 0.2)
-        detail1_txt = Text("Key detail 1\\n(explanation)", color=BLUE_E).scale(0.32).move_to(detail1_box.get_center())
+        detail1_txt = Text("Key detail 1 explanation", color=BLUE_E).scale(0.32).move_to(detail1_box.get_center())
 
         detail2_box = RoundedRectangle(width=6.2, height=1.2, color=PURPLE, fill_opacity=0.15).shift(DOWN * 1.3)
-        detail2_txt = Text("Key detail 2\\n(explanation)", color=PURPLE).scale(0.32).move_to(detail2_box.get_center())
+        detail2_txt = Text("Key detail 2 explanation", color=PURPLE).scale(0.32).move_to(detail2_box.get_center())
 
         self.play(Create(VGroup(detail1_box, detail1_txt)), run_time=3)
         self.play(Flash(detail1_box, color=BLUE_E, line_length=0.3), run_time=1)
@@ -230,15 +228,18 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 • Adapt the 5 phases to your specific topic content
 • Keep the exact structure and timing of each phase
 • Maintain the visual style (rectangles, colors, animations)
+• CRITICAL: Do NOT use escape sequences like \\n or line breaks in Text content
+• CRITICAL: Keep all text on single lines to avoid syntax errors
+• CRITICAL: Do not break strings across multiple lines in your code
 
 ─── C. VISUAL ELEMENTS (use these from the template) ───────────────────────
 • RoundedRectangle, Rectangle for boxes
-• Text for all text content
-• MathTex for formulas
+• Text for all text content including formulas
 • Line, Arrow for connections
 • VGroup for grouping elements
 • FadeIn, FadeOut, Create, Flash for animations
 • Colors: BLUE_E, PURPLE, ORANGE, GREEN_E, TEAL, RED_E, GRAY_D, BLACK
+• CRITICAL: Use Text for everything including formulas - do NOT use MathTex
 
 ─── D. TIMING RULES (STRICT 60s) ────────────────────────────────────────────
 • CRITICAL: Total video length MUST be exactly 60 seconds, no more, no less.
@@ -261,13 +262,14 @@ START FROM THE TEMPLATE below and ADAPT it — never invent a new structure:
 • DO NOT add any other code after scene.render() that would prevent execution.
 
 ─── E. STABILITY RULES (prevent runtime crashes) ────────────────────────────
-1. ONLY use Manim classes from the template: Scene, Text, MathTex, VGroup,
+1. ONLY use Manim classes from the template: Scene, Text, VGroup,
    Rectangle, RoundedRectangle, Line, Arrow, FadeIn, FadeOut, Create, Flash
 2. NEVER use Transform(), ReplacementTransform(), TransformMatchingShapes()
-3. NEVER use non-existent classes: Checkmark, Cross, Tick, etc.
+3. NEVER use non-existent classes: Checkmark, Cross, Tick, MathTex, etc.
 4. For symbols use Text with emoji characters
 5. Keep the exact structure of each phase from the template
 6. Always FadeOut old objects before FadeIn new ones
+7. CRITICAL: Use Text for ALL content including formulas - do NOT use escape sequences like \\n
 
 ═══════════════════════════════════════════════════════════════════
 TTS SCRIPT RULES (tts_script_hindi)
@@ -355,7 +357,9 @@ def generate_script(
             f"CRITICAL: TTS [0s] must start with catchy topic opening, NOT 'namaste'. "
             f"Final TTS paragraph must end with 'devs dot four zero four'.\n"
             f"CRITICAL: Total video MUST be exactly 60 seconds. Follow the template timing: "
-            f"Phase 1: 0-10s, Phase 2: 10-25s, Phase 3: 25-40s, Phase 4: 40-52s, Phase 5: 52-60s."
+            f"Phase 1: 0-10s, Phase 2: 10-25s, Phase 3: 25-40s, Phase 4: 40-52s, Phase 5: 52-60s.\n"
+            f"CRITICAL: Do NOT use escape sequences like \\n or line breaks in Text content. "
+            f"Keep all text on single lines to avoid syntax errors."
         )
 
     response = client.models.generate_content(
