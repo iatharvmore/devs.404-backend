@@ -1,5 +1,6 @@
 {
   "job_id": "bb2b04b1-0bc4-4ba4-8e40-527c2f6abfef",
   "topic": "LLM chain of thought working",
-  "status": "generating"
+  "status": "failed",
+  "error": "Traceback (most recent call last):\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/scripts/generate_job.py\", line 42, in main\n    result = generate_for_preview(topic, settings)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/pipeline.py\", line 131, in generate_for_preview\n    _validate_tts_script(script.tts_script_hindi)\n  File \"/home/runner/work/devs.404-backend/devs.404-backend/pipeline.py\", line 93, in _validate_tts_script\n    raise ValueError(\nValueError: TTS script is too long: 208 words. For a 60-second video, the script should be 150-180 words maximum. Current script is too long and will result in a video exceeding 60 seconds.\n"
 }
