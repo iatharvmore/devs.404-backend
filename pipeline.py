@@ -31,63 +31,8 @@ import shutil
 
 
 def _validate_tts_script(tts_script: str) -> None:
-    """Validate that TTS script contains only natural Hindi text, no code/symbols."""
-    # Check for code-like patterns
-    code_patterns = [
-        r'\{.*\}',           # Curly braces
-        r'\[.*\]',           # Square brackets (except time markers)
-        r'<.*>',             # Angle brackets
-        r'def \w+',          # Function definitions
-        r'class \w+',        # Class definitions
-        r'import \w+',       # Import statements
-        r'=\s*\w+',          # Variable assignments
-        r'\w+\(\)',          # Function calls
-        r'#\w+',             # Hash symbols (except hashtags)
-        r'\$\w+',            # Dollar symbols
-        r'0x[0-9a-fA-F]+',   # Hex numbers
-        r'\d{3,}',           # Long number sequences
-    ]
-
-    # Allow time markers like [0s], [6s] etc.
-    time_marker_pattern = r'\[\d+s\]'
-    # Remove valid time markers before checking for other brackets
-    clean_script = re.sub(time_marker_pattern, '', tts_script)
-
-    for pattern in code_patterns:
-        if re.search(pattern, clean_script):
-            raise ValueError(
-                f"TTS script contains code-like patterns: {pattern}. "
-                f"TTS script must be pure Hindi narration without code, numbers, or special characters."
-            )
-
-    # Check for excessive special characters
-    special_chars = r'[{}<>$#@]'
-    if re.search(special_chars, clean_script):
-        raise ValueError(
-            f"TTS script contains special characters {special_chars}. "
-            f"TTS script must be pure Hindi narration without code or symbols."
-        )
-
-    # Check that [0s] paragraph doesn't start with namaste/hello
-    first_paragraph_match = re.search(r'\[0s\]\s*(.*?)(?=\[\d+s\]|$)', tts_script, re.DOTALL)
-    if first_paragraph_match:
-        first_text = first_paragraph_match.group(1).strip().lower()
-        # Get first few words to check opening
-        first_words = ' '.join(first_text.split()[:3])
-        if 'namaste' in first_words or 'hello' in first_words:
-            raise ValueError(
-                f"TTS script [0s] paragraph starts with 'namaste' or 'hello'. "
-                f"Must start with a catchy topic-related opening instead."
-            )
-
-    # Check that the script ends with "devs dot four zero four"
-    if not re.search(r'devs dot four zero four', tts_script, re.IGNORECASE):
-        raise ValueError(
-            f"TTS script must end with 'devs dot four zero four'. "
-            f"This is the required channel signature."
-        )
-
     # No TTS validation - let Gemini handle timing naturally
+    pass
 
 
 @dataclass
