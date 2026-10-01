@@ -203,6 +203,12 @@ explains AI / computer science topics in 50-60 seconds.
 CRITICAL TIMING CONSTRAINT: The TOTAL animation duration MUST be exactly 50-60 seconds.
 Do NOT exceed 60 seconds. Calculate total by summing all run_time + self.wait() values.
 
+CRITICAL ASSET CONSTRAINTS:
+- NEVER use ImageMobject, SVGMobject, or any external image/file assets
+- ONLY use built-in Manim objects: Text, MathTex, Rectangle, Circle, Line, Arrow, RoundedRectangle, VGroup, etc.
+- Do NOT reference any external files (.png, .jpg, .svg, etc.) - they will not exist
+- Do NOT use triple quotes inside Text() - use single quotes or escaped quotes
+
 Use the following as a style reference, but DO NOT copy the exact structure.
 Be creative and vary the layout, number of phases, and visual approach for each topic:
 
@@ -216,10 +222,11 @@ Instructions:
 3. EVERY phase must have a comment showing its time range: # [Xs - Ys]
 4. Calculate total duration: sum of all run_time + self.wait() values MUST be 50-60 seconds
 5. Keep the mobile vertical 9:16 config: pixel_height=1280, pixel_width=720, frame_height=16.0, frame_width=9.0
-6. Keep the render block pattern: scene = YourClassName(); scene.render()
+6. Keep the render block pattern EXACTLY as: scene = YourClassName(); scene.render()
 7. NEVER import IPython, Jupyter, or any notebook-specific modules. The code runs as a standalone Python script.
-8. Generate a matching Hindi TTS script (50-60 seconds) that ends with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
-9. Generate a short caption and relevant hashtags
+8. NEVER use ImageMobject, SVGMobject, or external assets - only built-in Manim objects
+9. Generate a matching Hindi TTS script (50-60 seconds) that ends with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
+10. Generate a short caption and relevant hashtags
 
 Return ONLY the JSON object matching the given schema — no markdown fences,
 no commentary.
@@ -243,10 +250,15 @@ def generate_script(
 
     user_prompt = f"Topic for today's reel: {topic}"
     if error_feedback:
-        error_snippet = error_feedback[-1000:] if len(error_feedback) > 1000 else error_feedback
+        error_snippet = error_feedback[-1500:] if len(error_feedback) > 1500 else error_feedback
         user_prompt += (
-            f"\n\nPrevious rendering error:\n{error_snippet}\n\n"
-            f"Fix the issue and try again following the working example structure."
+            f"\n\nCRITICAL - Previous rendering error:\n{error_snippet}\n\n"
+            f"FIX REQUIRED:\n"
+            f"1. If error mentions ImageMobject/SVGMobject: REMOVE all external image/file references. Use ONLY built-in Manim objects (Text, MathTex, Rectangle, Circle, etc.)\n"
+            f"2. If error mentions missing scene.render(): Ensure code ends with: scene = YourClassName(); scene.render()\n"
+            f"3. If error mentions triple quotes: Use single quotes in Text() - Text('text') not Text(\"\"\"text\"\"\")\n"
+            f"4. Recalculate timing to ensure total is 50-60 seconds\n"
+            f"5. Follow ALL constraints in the system instructions strictly"
         )
 
     response = client.models.generate_content(

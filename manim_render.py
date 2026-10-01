@@ -35,17 +35,42 @@ def render_scene(manim_code: str, work_dir: str | Path) -> Path:
             f"This indicates the Gemini model broke the template syntax."
         )
 
-    # No timing validation - trust the working example structure
+    # Validate that the script contains the required render call
+    if "scene.render()" not in manim_code:
+        raise ValueError(
+            "Generated Manim script does not contain the required scene.render() call. "
+            "The script must end with: scene = YourClassName(); scene.render()"
+        )
+
+    # Validate no external assets are used
+    forbidden_patterns = [
+        "ImageMobject",
+        "SVGMobject",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".svg",
+        ".gif",
+        ".ico",
+        "speech_bubble",
+    ]
+    for pattern in forbidden_patterns:
+        if pattern in manim_code:
+            raise ValueError(
+                f"Generated Manim script contains forbidden pattern '{pattern}'. "
+                f"NEVER use ImageMobject, SVGMobject, or external image/file assets. "
+                f"Use ONLY built-in Manim objects: Text, MathTex, Rectangle, Circle, Line, Arrow, etc."
+            )
+
+    # Validate no triple quotes in Text() calls
+    if 'Text("""' in manim_code or 'Text("""' in manim_code:
+        raise ValueError(
+            "Generated Manim script contains triple quotes in Text() calls. "
+            "Use single quotes instead: Text('text') not Text(\"\"\"text\"\"\")"
+        )
 
     script_path = work_dir / "generated_scene.py"
     script_path.write_text(manim_code, encoding="utf-8")
-
-    # Validate that the script contains the required render call
-    if "scene.render()" not in manim_code and "__main__" not in manim_code:
-        raise ValueError(
-            "Generated Manim script does not contain the required scene.render() call. "
-            "The script must end with: if __name__ == '__main__': scene.render()"
-        )
 
     scene_name = _extract_scene_class_name(manim_code)
     print(f"[manim_render] Scene name extracted: {scene_name}")
