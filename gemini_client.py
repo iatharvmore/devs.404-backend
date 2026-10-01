@@ -20,7 +20,6 @@ _MANIM_TEMPLATE = '''
 from manim import *
 import numpy as np
 import random
-from IPython.display import Video
 
 # --- CONFIG (Mobile Vertical 9:16) ---
 config.pixel_height = 1280
@@ -195,7 +194,6 @@ class ConformerASR60s(Scene):
 # --- RENDER ---
 scene = ConformerASR60s()
 scene.render()
-Video(scene.renderer.file_writer.movie_file_path, embed=True)
 '''
 
 SYSTEM_INSTRUCTIONS = f"""\
@@ -212,8 +210,9 @@ Instructions:
 1. Replace Conformer ASR content with the new topic content
 2. Keep the exact structure, timing (0-10s, 10-25s, 25-40s, 40-52s, 52-60s), and visual style
 3. Keep the render block exactly as: scene = ConformerASR60s(); scene.render()
-4. Generate a matching Hindi TTS script (approx 60 seconds) that ends with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
-5. Generate a short caption and relevant hashtags
+4. NEVER import IPython, Jupyter, or any notebook-specific modules. The code runs as a standalone Python script.
+5. Generate a matching Hindi TTS script (approx 60 seconds) that ends with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
+6. Generate a short caption and relevant hashtags
 
 Return ONLY the JSON object matching the given schema — no markdown fences,
 no commentary.
