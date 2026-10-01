@@ -17,8 +17,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ffmpeg \
+            pkg-config \
+            libcairo2-dev \
+            libpango1.0-dev \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            dvipng
 
       - name: Install Python deps
         run: pip install -r requirements.txt

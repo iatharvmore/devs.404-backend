@@ -34,7 +34,10 @@ jobs:
             ffmpeg \
             pkg-config \
             libcairo2-dev \
-            libpango1.0-dev
+            libpango1.0-dev \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            dvipng
 
       - name: Install Python deps
         run: |
