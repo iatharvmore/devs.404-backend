@@ -42,7 +42,7 @@ class ConformerASR60s(Scene):
         self.add(header, subtitle, formula)
 
         # ==========================================
-        # PHASE 1: THE DILEMMA - CNN VS TRANSFORMER (0-10s)
+        # PHASE 1: THE DILEMMA - CNN VS TRANSFORMER (0-12s)
         # ==========================================
         cnn_box = RoundedRectangle(width=3.2, height=1.6, color=BLUE_E, fill_opacity=0.15).shift(LEFT * 1.8 + DOWN * 0.8)
         cnn_title = Text("CNN", color=BLUE_E, weight=BOLD).scale(0.5).move_to(cnn_box.get_top() + DOWN * 0.3)
@@ -65,10 +65,10 @@ class ConformerASR60s(Scene):
             FadeIn(plus_sign),
             run_time=2
         )
-        self.wait(1)
+        self.wait(5)
 
         # ==========================================
-        # PHASE 2: THE MACARON-STYLE CONFORMER BLOCK (10-25s)
+        # PHASE 2: THE MACARON-STYLE CONFORMER BLOCK (12-28s)
         # ==========================================
         self.play(FadeOut(cnn_group), FadeOut(trans_group), FadeOut(plus_sign), run_time=1)
 
@@ -95,7 +95,7 @@ class ConformerASR60s(Scene):
             VGroup(ffn2, ffn2_txt)
         )
 
-        self.play(Create(macaron_stack, lag_ratio=0.2), run_time=5) # 13-18s
+        self.play(Create(macaron_stack, lag_ratio=0.2), run_time=5)
         self.wait(2)
 
         # Residual arrows
@@ -103,11 +103,11 @@ class ConformerASR60s(Scene):
         res_arrow = Arrow(start=ffn2.get_bottom() + DOWN * 0.3, end=ffn2.get_bottom(), color=GREEN_E, stroke_width=3)
         res_label = Text("Residual Connections + LayerNorm", color=GREEN_E).scale(0.32).next_to(macaron_stack, DOWN, buff=0.4)
 
-        self.play(Create(res_line), Create(res_arrow), FadeIn(res_label), run_time=3) # 20-23s
+        self.play(Create(res_line), Create(res_arrow), FadeIn(res_label), run_time=3)
         self.wait(2)
 
         # ==========================================
-        # PHASE 3: DEEP DIVE INTO CONVOLUTION & ATTENTION (25-40s)
+        # PHASE 3: DEEP DIVE INTO CONVOLUTION & ATTENTION (28-42s)
         # ==========================================
         self.play(
             FadeOut(macaron_stack),
@@ -140,10 +140,10 @@ class ConformerASR60s(Scene):
             run_time=3
         )
         self.play(Flash(rel_mhsa_box, color=PURPLE, line_length=0.3), run_time=1)
-        self.wait(3)
+        self.wait(2)
 
         # ==========================================
-        # PHASE 4: END-TO-END ASR PIPELINE (40-52s)
+        # PHASE 4: END-TO-END ASR PIPELINE (42-52s)
         # ==========================================
         self.play(
             FadeOut(VGroup(depthwise_box, depthwise_txt)),
@@ -175,7 +175,7 @@ class ConformerASR60s(Scene):
             VGroup(ctc_box, ctc_txt)
         )
 
-        self.play(Create(pipeline_stack, lag_ratio=0.2), run_time=5) # 43-48s
+        self.play(Create(pipeline_stack, lag_ratio=0.2), run_time=5)
         self.wait(2)
 
         # ==========================================
@@ -189,7 +189,7 @@ class ConformerASR60s(Scene):
         
         output_text = Text('"Hello World"', color=GREEN_E, weight=BOLD).scale(0.6).shift(UP * 1.2)
         self.play(FadeIn(output_text), Flash(output_text, color=GREEN_E), run_time=2)
-        self.wait(4) # CTA hold
+        self.wait(5)
 
 # --- RENDER ---
 scene = ConformerASR60s()
@@ -198,21 +198,28 @@ scene.render()
 
 SYSTEM_INSTRUCTIONS = f"""\
 You write content for an Instagram Reels channel called dev's.404 that
-explains AI / computer science topics in ~60 seconds.
+explains AI / computer science topics in 50-60 seconds.
 
-Adapt the following working example to the new topic:
+CRITICAL TIMING CONSTRAINT: The TOTAL animation duration MUST be exactly 50-60 seconds.
+Do NOT exceed 60 seconds. Calculate total by summing all run_time + self.wait() values.
+
+Use the following as a style reference, but DO NOT copy the exact structure.
+Be creative and vary the layout, number of phases, and visual approach for each topic:
 
 ```python
 {_MANIM_TEMPLATE.strip()}
 ```
 
 Instructions:
-1. Replace Conformer ASR content with the new topic content
-2. Keep the exact structure, timing (0-10s, 10-25s, 25-40s, 40-52s, 52-60s), and visual style
-3. Keep the render block exactly as: scene = ConformerASR60s(); scene.render()
-4. NEVER import IPython, Jupyter, or any notebook-specific modules. The code runs as a standalone Python script.
-5. Generate a matching Hindi TTS script (approx 60 seconds) that ends with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
-6. Generate a short caption and relevant hashtags
+1. Create original content for the new topic - do NOT copy the Conformer ASR structure
+2. Use your own creative layout, number of phases (3-5 phases recommended), and visual approach
+3. EVERY phase must have a comment showing its time range: # [Xs - Ys]
+4. Calculate total duration: sum of all run_time + self.wait() values MUST be 50-60 seconds
+5. Keep the mobile vertical 9:16 config: pixel_height=1280, pixel_width=720, frame_height=16.0, frame_width=9.0
+6. Keep the render block pattern: scene = YourClassName(); scene.render()
+7. NEVER import IPython, Jupyter, or any notebook-specific modules. The code runs as a standalone Python script.
+8. Generate a matching Hindi TTS script (50-60 seconds) that ends with "ऐसे ही AI Breakdowns के लिए अभी Follow करें!"
+9. Generate a short caption and relevant hashtags
 
 Return ONLY the JSON object matching the given schema — no markdown fences,
 no commentary.
